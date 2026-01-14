@@ -1,16 +1,11 @@
-export interface NotionRow {
-  Name: string;
-  Address: string;
-  Phone: string;
-  Email: string;
-  Organization: string;
-  Notes: string;
+export interface DynamicRow {
+  [key: string]: string;
 }
 
 export interface ExtractionResult {
   document_type_guess: string;
   extracted_text: string;
-  extracted_table: NotionRow[];
+  extracted_table: DynamicRow[];
   warnings?: string[];
 }
 
