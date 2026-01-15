@@ -5,6 +5,7 @@ import { ExtractedTableView } from './components/ExtractedTableView';
 import { PdfUploadView } from './components/PdfUploadView';
 import { HistorySidebar, HistoryEntry } from './components/HistorySidebar';
 import { RateLimitIndicator, getUsageToday, incrementUsage, DAILY_LIMIT } from './components/RateLimitIndicator';
+import { InstallPrompt } from './components/InstallPrompt';
 import { extractDataFromImage } from './services/geminiService';
 import { ExtractionResult, DynamicRow, ProcessingStatus } from './types';
 import { Sparkles, Layout, Database, AlertCircle, Image, FileText, Sun, Moon, Wheat, History, Layers } from 'lucide-react';
@@ -319,7 +320,7 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Rate Limit Indicator */}
             <div className="hidden md:block">
               <RateLimitIndicator usedToday={usageToday} dailyLimit={DAILY_LIMIT} />
@@ -620,6 +621,9 @@ const App: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Install Prompt Banner */}
+      <InstallPrompt />
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 glass-footer py-2 md:py-3 z-40">
