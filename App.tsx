@@ -310,9 +310,9 @@ const App: React.FC = () => {
       {/* Header */}
       <header className="glass-header sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 glass-card-sm">
-              <Wheat className="w-7 h-7 farmer-icon" />
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="p-2 glass-card-sm flex items-center justify-center">
+              <Wheat className="w-6 h-6 sm:w-7 sm:h-7 farmer-icon" />
             </div>
             <div className="hidden sm:block">
               <h1 className="text-lg font-bold text-earth">Farmer OCR</h1>
