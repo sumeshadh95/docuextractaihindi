@@ -12,17 +12,23 @@ Your job is to extract and separate content into two editable sections:
 
 **Core requirements:**
 
+**CRITICAL VALUE EXTRACTION RULES:**
+- Extract the ACTUAL DATA VALUES from document cells, NOT the column header text.
+- For "पति/पिता का नाम" (Father/Husband Name) column: Extract the ACTUAL person names written in that column (e.g., "लक्ष्मीदेव मिश्र", "अंकुर प्रसाद"), NOT the header text "पति/पिता का नाम".
+- If a cell appears empty or illegible, use "" (empty string).
+- NEVER repeat the column header as the cell value.
+
 **Dynamic Header Mapping (CRITICAL)**
 - You will be provided with a specific list of target headers (e.g., in Hindi).
 - You MUST map the extracted information to these EXACT headers.
 - **Mapping Logic**:
   - If you find "Name" or "Farmer Name" -> Map to the header close to "Name" (e.g., "S.No", "भी.आर.पी नाम" etc. based on context, usually "किसान नाम" for Farmer Name).
-  - if you find "Father's Name" -> Map to "पति/पिता का नाम".
+  - if you find "Father's Name" / "पिता का नाम" -> Map to "पति/पिता का नाम".
   - "Village" -> "गाँव".
   - "Crop" -> "फसल".
   - "Area" -> "क्षेत्रफल (कट्ठा)".
   - "Date" -> "रोपाई/बुआई तिथि".
-  - "Total Production" -> "कुल तोड़ाई (Kg)".
+  - "Total Production" -> "कुल तोड़ाई (Kg)".
   - "Income" -> "कुल आमदनी (रु०)".
   - "S.No" -> "S.No.".
 - **Auto-Correction**: Continue to fix obvious OCR errors (e.g., "feer" -> "feel", "pokar" -> "pokhara").
