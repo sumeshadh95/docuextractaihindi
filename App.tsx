@@ -138,7 +138,7 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {/* Farmer Icon */}
-            <div className="p-2 bg-white/20 rounded-xl">
+            <div className="p-2 bg-white/5 border border-white/5 rounded-xl">
               <Wheat className="w-7 h-7 text-white" />
             </div>
             <div>
@@ -150,7 +150,7 @@ const App: React.FC = () => {
           {/* Dark Mode Toggle */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="dark-mode-toggle flex items-center space-x-2"
+            className="p-2 bg-white/5 border border-white/5 rounded-full hover:bg-white/10 transition-colors"
             title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {darkMode ? (
@@ -168,7 +168,7 @@ const App: React.FC = () => {
           <div className="glass-card-sm mb-6 p-4 flex items-start space-x-3 border-l-4 border-amber-500">
             <AlertCircle className="w-5 h-5 mt-0.5 text-amber-600" />
             <div className="text-sm text-earth">
-              <strong>Missing API Key:</strong> Set <code className="bg-black/10 px-1.5 py-0.5 rounded">VITE_API_KEY</code> in <code className="bg-black/10 px-1.5 py-0.5 rounded">.env.local</code>
+              <strong>Missing API Key:</strong> Set <code className="bg-white/10 px-1.5 py-0.5 rounded">VITE_API_KEY</code> in <code className="bg-white/10 px-1.5 py-0.5 rounded">.env.local</code>
             </div>
           </div>
         )}
@@ -183,7 +183,7 @@ const App: React.FC = () => {
                 onClick={() => { setInputMode('image'); handleClearFile(); }}
                 className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl text-sm font-medium transition-all ${inputMode === 'image'
                   ? 'btn-farmer'
-                  : 'text-earth-muted hover:text-earth hover:bg-black/5'
+                  : 'text-earth-muted hover:text-earth hover:bg-white/5'
                   }`}
               >
                 <Image className="w-4 h-4" />
@@ -193,7 +193,7 @@ const App: React.FC = () => {
                 onClick={() => { setInputMode('pdf'); handleClearFile(); }}
                 className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl text-sm font-medium transition-all ${inputMode === 'pdf'
                   ? 'btn-farmer'
-                  : 'text-earth-muted hover:text-earth hover:bg-black/5'
+                  : 'text-earth-muted hover:text-earth hover:bg-white/5'
                   }`}
               >
                 <FileText className="w-4 h-4" />
@@ -219,7 +219,7 @@ const App: React.FC = () => {
                   {imagePreview && (
                     <div className="mt-6">
                       <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">Preview</p>
-                      <div className="relative rounded-xl overflow-hidden border border-black/10 aspect-[3/4] bg-black/5">
+                      <div className="relative rounded-xl overflow-hidden border border-white/5 aspect-[3/4] bg-white/5">
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
                       </div>
                     </div>
@@ -242,7 +242,7 @@ const App: React.FC = () => {
                       <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">
                         Selected: Page {pdfPageNumber}
                       </p>
-                      <div className="relative rounded-xl overflow-hidden border border-black/10 aspect-[3/4] bg-black/5">
+                      <div className="relative rounded-xl overflow-hidden border border-white/5 aspect-[3/4] bg-white/5">
                         <img src={imagePreview} alt={`Page ${pdfPageNumber}`} className="w-full h-full object-contain" />
                       </div>
                     </div>
@@ -272,7 +272,7 @@ const App: React.FC = () => {
                 className={`
                   mt-6 w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-full font-semibold transition-all
                   ${!canProcess || status === ProcessingStatus.PROCESSING
-                    ? 'bg-black/10 text-earth-muted cursor-not-allowed'
+                    ? 'bg-white/5 text-earth-muted cursor-not-allowed'
                     : 'btn-farmer'
                   }
                 `}
@@ -291,7 +291,7 @@ const App: React.FC = () => {
               </button>
 
               {errorMsg && (
-                <div className="mt-4 p-3 text-sm rounded-xl flex items-start space-x-2 bg-red-500/10 text-red-700 border border-red-500/20">
+                <div className="mt-4 p-3 text-sm rounded-xl flex items-start space-x-2 bg-red-500/10 text-red-400 border border-red-500/20">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
@@ -300,12 +300,12 @@ const App: React.FC = () => {
 
             {/* Warnings */}
             {result?.warnings && result.warnings.length > 0 && (
-              <div className="glass-card-sm p-4 border-l-4 border-amber-500">
-                <h3 className="text-sm font-semibold mb-2 flex items-center text-amber-700">
+              <div className="glass-card-sm p-4 border-l-4 border-amber-500/50 bg-amber-500/5">
+                <h3 className="text-sm font-semibold mb-2 flex items-center text-amber-400">
                   <AlertCircle className="w-4 h-4 mr-2" />
                   AI Warnings
                 </h3>
-                <ul className="list-disc list-inside text-xs space-y-1 text-amber-600">
+                <ul className="list-disc list-inside text-xs space-y-1 text-amber-300/80">
                   {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
                 </ul>
               </div>
@@ -316,7 +316,7 @@ const App: React.FC = () => {
           <div className="lg:col-span-8">
             {!result ? (
               <div className="glass-card h-full min-h-[500px] flex flex-col items-center justify-center p-8">
-                <div className="p-6 rounded-full mb-4 bg-black/5">
+                <div className="p-6 rounded-full mb-4 bg-white/5 border border-white/5">
                   <Layout className="w-12 h-12 text-earth-muted" />
                 </div>
                 <h3 className="text-lg font-medium text-earth">No Data Extracted Yet</h3>
@@ -334,8 +334,8 @@ const App: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('table')}
                     className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === 'table'
-                      ? 'bg-black/10 text-earth'
-                      : 'text-earth-muted hover:text-earth hover:bg-black/5'
+                      ? 'bg-white/10 text-earth'
+                      : 'text-earth-muted hover:text-earth hover:bg-white/5'
                       }`}
                   >
                     <Database className="w-4 h-4" />
@@ -344,8 +344,8 @@ const App: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('text')}
                     className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === 'text'
-                      ? 'bg-black/10 text-earth'
-                      : 'text-earth-muted hover:text-earth hover:bg-black/5'
+                      ? 'bg-white/10 text-earth'
+                      : 'text-earth-muted hover:text-earth hover:bg-white/5'
                       }`}
                   >
                     <Layout className="w-4 h-4" />
