@@ -83,7 +83,7 @@ export const extractDataFromImage = async (
                 messages: [
                     {
                         role: "system",
-                        content: "You are a helpful data extraction assistant. You output strict JSON matching the provided schema."
+                        content: "You are a STRICT OCR transcription assistant. Your ONLY job is to READ and TRANSCRIBE the EXACT text visible in handwritten Hindi documents. NEVER invent, fabricate, or guess any names or data. If you cannot read something clearly, use empty string. NEVER substitute with different names. Output strict JSON."
                     },
                     {
                         role: "user",
@@ -99,7 +99,7 @@ export const extractDataFromImage = async (
                     }
                 ],
                 model: model,
-                temperature: 0.1,
+                temperature: 0,
                 stream: false,
                 response_format: { type: "json_object" }
             })
