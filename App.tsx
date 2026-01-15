@@ -5,11 +5,17 @@ import { ExtractedTableView } from './components/ExtractedTableView';
 import { PdfUploadView } from './components/PdfUploadView';
 import { extractDataFromImage } from './services/geminiService';
 import { ExtractionResult, DynamicRow, ProcessingStatus } from './types';
-import { Sparkles, Layout, Database, AlertCircle, Image, FileText, Download } from 'lucide-react';
+import { Sparkles, Layout, Database, AlertCircle, Image, FileText, Sun, Moon, Wheat } from 'lucide-react';
 
 const App: React.FC = () => {
   // Input mode
   const [inputMode, setInputMode] = useState<'image' | 'pdf'>('image');
+
+  // Dark mode
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true';
+  });
 
   // Image extraction state
   const [file, setFile] = useState<File | null>(null);
@@ -37,6 +43,16 @@ const App: React.FC = () => {
     "कुल तोड़ाई (Kg)",
     "कुल आमदनी (रु०)"
   ]);
+
+  // Apply dark mode class
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', darkMode.toString());
+  }, [darkMode]);
 
   const handleFileSelect = (selectedFile: File) => {
     setFile(selectedFile);
@@ -117,35 +133,42 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Glass Header */}
+      {/* Header */}
       <header className="glass-header sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <img
-              src="/groundswell-logo.png"
-              alt="Groundswell International"
-              className="h-10 object-contain"
-            />
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-semibold text-white">DocuExtract AI</h1>
-              <p className="text-xs text-white/60">Data Extraction Tool</p>
+          <div className="flex items-center space-x-3">
+            {/* Farmer Icon */}
+            <div className="p-2 bg-white/20 rounded-xl">
+              <Wheat className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">Farmer OCR</h1>
+              <p className="text-xs text-white/70">Data Extraction Tool</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-white/60 hidden md:block">
-              Powered by Google Gemini
-            </span>
-          </div>
+
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="dark-mode-toggle flex items-center space-x-2"
+            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {darkMode ? (
+              <Sun className="w-5 h-5 text-yellow-400" />
+            ) : (
+              <Moon className="w-5 h-5 text-white" />
+            )}
+          </button>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* API Key Warning */}
         {!import.meta.env.VITE_API_KEY && (
-          <div className="glass-card-sm mb-6 p-4 flex items-start space-x-3 border-l-4 border-amber-400">
-            <AlertCircle className="w-5 h-5 mt-0.5 text-amber-300" />
-            <div className="text-sm text-white">
-              <strong>Missing API Key:</strong> Set <code className="bg-white/10 px-1.5 py-0.5 rounded">VITE_API_KEY</code> (Google Gemini) in <code className="bg-white/10 px-1.5 py-0.5 rounded">.env.local</code>
+          <div className="glass-card-sm mb-6 p-4 flex items-start space-x-3 border-l-4 border-amber-500">
+            <AlertCircle className="w-5 h-5 mt-0.5 text-amber-600" />
+            <div className="text-sm text-earth">
+              <strong>Missing API Key:</strong> Set <code className="bg-black/10 px-1.5 py-0.5 rounded">VITE_API_KEY</code> in <code className="bg-black/10 px-1.5 py-0.5 rounded">.env.local</code>
             </div>
           </div>
         )}
@@ -154,13 +177,13 @@ const App: React.FC = () => {
           {/* Left Column: Input */}
           <div className="lg:col-span-4 space-y-6">
 
-            {/* Mode Selector - Glass Style */}
+            {/* Mode Selector */}
             <div className="glass-card-sm p-1.5 flex">
               <button
                 onClick={() => { setInputMode('image'); handleClearFile(); }}
                 className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl text-sm font-medium transition-all ${inputMode === 'image'
-                  ? 'btn-groundswell'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                  ? 'btn-farmer'
+                  : 'text-earth-muted hover:text-earth hover:bg-black/5'
                   }`}
               >
                 <Image className="w-4 h-4" />
@@ -169,8 +192,8 @@ const App: React.FC = () => {
               <button
                 onClick={() => { setInputMode('pdf'); handleClearFile(); }}
                 className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl text-sm font-medium transition-all ${inputMode === 'pdf'
-                  ? 'btn-groundswell'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                  ? 'btn-farmer'
+                  : 'text-earth-muted hover:text-earth hover:bg-black/5'
                   }`}
               >
                 <FileText className="w-4 h-4" />
@@ -178,12 +201,12 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            {/* Input Area - Glass Card */}
+            {/* Input Area */}
             <div className="glass-card p-6">
               {inputMode === 'image' ? (
                 <>
-                  <h2 className="text-lg font-semibold mb-1 text-white">Upload Document Image</h2>
-                  <p className="text-xs mb-4 text-white/60">
+                  <h2 className="text-lg font-semibold mb-1 text-earth">Upload Document Image</h2>
+                  <p className="text-xs mb-4 text-earth-muted">
                     Upload a photo or scan of your document
                   </p>
                   <FileUpload
@@ -195,8 +218,8 @@ const App: React.FC = () => {
 
                   {imagePreview && (
                     <div className="mt-6">
-                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-white/60">Preview</p>
-                      <div className="relative rounded-xl overflow-hidden border border-white/20 aspect-[3/4] bg-black/20">
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">Preview</p>
+                      <div className="relative rounded-xl overflow-hidden border border-black/10 aspect-[3/4] bg-black/5">
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
                       </div>
                     </div>
@@ -204,8 +227,8 @@ const App: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <h2 className="text-lg font-semibold mb-1 text-white">Convert PDF to Image</h2>
-                  <p className="text-xs mb-4 text-white/60">
+                  <h2 className="text-lg font-semibold mb-1 text-earth">Convert PDF to Image</h2>
+                  <p className="text-xs mb-4 text-earth-muted">
                     Upload PDF, select a page, then extract data
                   </p>
                   <PdfUploadView
@@ -216,10 +239,10 @@ const App: React.FC = () => {
 
                   {imagePreview && pdfPageNumber && (
                     <div className="mt-6">
-                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-white/60">
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">
                         Selected: Page {pdfPageNumber}
                       </p>
-                      <div className="relative rounded-xl overflow-hidden border border-white/20 aspect-[3/4] bg-black/20">
+                      <div className="relative rounded-xl overflow-hidden border border-black/10 aspect-[3/4] bg-black/5">
                         <img src={imagePreview} alt={`Page ${pdfPageNumber}`} className="w-full h-full object-contain" />
                       </div>
                     </div>
@@ -236,7 +259,7 @@ const App: React.FC = () => {
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <p className="text-xs mt-2 text-center text-white/60">
+                  <p className="text-xs mt-2 text-center text-earth-muted">
                     {progress < 30 ? 'Preparing...' : progress < 90 ? 'AI is analyzing...' : 'Finishing up...'}
                   </p>
                 </div>
@@ -249,8 +272,8 @@ const App: React.FC = () => {
                 className={`
                   mt-6 w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-full font-semibold transition-all
                   ${!canProcess || status === ProcessingStatus.PROCESSING
-                    ? 'bg-white/10 text-white/40 cursor-not-allowed'
-                    : 'btn-groundswell'
+                    ? 'bg-black/10 text-earth-muted cursor-not-allowed'
+                    : 'btn-farmer'
                   }
                 `}
               >
@@ -268,7 +291,7 @@ const App: React.FC = () => {
               </button>
 
               {errorMsg && (
-                <div className="mt-4 p-3 text-sm rounded-xl flex items-start space-x-2 bg-red-500/20 text-red-200 border border-red-500/30">
+                <div className="mt-4 p-3 text-sm rounded-xl flex items-start space-x-2 bg-red-500/10 text-red-700 border border-red-500/20">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
@@ -277,12 +300,12 @@ const App: React.FC = () => {
 
             {/* Warnings */}
             {result?.warnings && result.warnings.length > 0 && (
-              <div className="glass-card-sm p-4 border-l-4 border-amber-400">
-                <h3 className="text-sm font-semibold mb-2 flex items-center text-amber-300">
+              <div className="glass-card-sm p-4 border-l-4 border-amber-500">
+                <h3 className="text-sm font-semibold mb-2 flex items-center text-amber-700">
                   <AlertCircle className="w-4 h-4 mr-2" />
                   AI Warnings
                 </h3>
-                <ul className="list-disc list-inside text-xs space-y-1 text-amber-200/80">
+                <ul className="list-disc list-inside text-xs space-y-1 text-amber-600">
                   {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
                 </ul>
               </div>
@@ -293,11 +316,11 @@ const App: React.FC = () => {
           <div className="lg:col-span-8">
             {!result ? (
               <div className="glass-card h-full min-h-[500px] flex flex-col items-center justify-center p-8">
-                <div className="p-6 rounded-full mb-4 bg-white/10">
-                  <Layout className="w-12 h-12 text-white/40" />
+                <div className="p-6 rounded-full mb-4 bg-black/5">
+                  <Layout className="w-12 h-12 text-earth-muted" />
                 </div>
-                <h3 className="text-lg font-medium text-white">No Data Extracted Yet</h3>
-                <p className="text-sm max-w-xs text-center mt-2 text-white/60">
+                <h3 className="text-lg font-medium text-earth">No Data Extracted Yet</h3>
+                <p className="text-sm max-w-xs text-center mt-2 text-earth-muted">
                   {inputMode === 'image'
                     ? 'Upload a document image and click "Extract Data"'
                     : 'Upload a PDF, select a page, and click "Extract Data"'
@@ -311,8 +334,8 @@ const App: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('table')}
                     className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === 'table'
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/60 hover:text-white hover:bg-white/10'
+                      ? 'bg-black/10 text-earth'
+                      : 'text-earth-muted hover:text-earth hover:bg-black/5'
                       }`}
                   >
                     <Database className="w-4 h-4" />
@@ -321,8 +344,8 @@ const App: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('text')}
                     className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === 'text'
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/60 hover:text-white hover:bg-white/10'
+                      ? 'bg-black/10 text-earth'
+                      : 'text-earth-muted hover:text-earth hover:bg-black/5'
                       }`}
                   >
                     <Layout className="w-4 h-4" />
@@ -347,8 +370,8 @@ const App: React.FC = () => {
                   )}
                 </div>
 
-                <div className="mt-4 flex justify-between items-center text-xs text-white/50">
-                  <p>AI Model: Google Gemini 2.0 Flash</p>
+                <div className="mt-4 flex justify-between items-center text-xs text-earth-muted">
+                  <p>Farmer OCR • Data Extraction</p>
                   <p>Document Type: {result.document_type_guess || 'Unknown'}</p>
                 </div>
               </div>
@@ -360,8 +383,8 @@ const App: React.FC = () => {
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 glass-header py-3">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-xs text-white/50">
-            © 2024 Groundswell International • DocuExtract AI - Farmer Data Collection Tool
+          <p className="text-xs text-white/70">
+            © 2024 Farmer OCR • Agricultural Data Collection Tool
           </p>
         </div>
       </footer>

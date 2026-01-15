@@ -17,7 +17,6 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
   const [originalRows, setOriginalRows] = useState<DynamicRow[] | null>(null);
   const [isHindiMode, setIsHindiMode] = useState(false);
 
-  // Columns that typically contain text to transliterate
   const textColumns = headers.filter(h =>
     h.toLowerCase().includes('name') ||
     h.toLowerCase().includes('नाम') ||
@@ -52,27 +51,20 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
   const handleExportXLSX = () => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(rows, { header: headers });
-
-    // Auto-width
     const wscols = headers.map(() => ({ wch: 20 }));
     ws['!cols'] = wscols;
-
     XLSX.utils.book_append_sheet(wb, ws, "Contacts");
     XLSX.writeFile(wb, "extracted_data.xlsx");
   };
 
   const handleConvertToHindi = async () => {
     if (rows.length === 0) return;
-
     setIsTransliterating(true);
     setTransliterationError(null);
 
     try {
-      // Pass all text columns for transliteration
       const columnsToConvert = textColumns.length > 0 ? textColumns : headers.slice(0, 5);
       const result = await transliterateToHindi(rows, columnsToConvert);
-
-      // Store original rows for revert
       setOriginalRows(result.originalRows);
       onRowsChange(result.transliteratedRows);
       setIsHindiMode(true);
@@ -92,10 +84,6 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
     }
   };
 
-  const handleHeaderStartUpload = () => {
-    document.getElementById('header-upload-input')?.click();
-  };
-
   const handleHeaderFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -113,7 +101,6 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
       }
     };
     reader.readAsBinaryString(file);
-    // Reset
     e.target.value = '';
   };
 
@@ -121,11 +108,11 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header Bar */}
-      <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center">
+      <div className="px-6 py-4 border-b border-black/10 flex justify-between items-center">
         <div>
-          <h3 className="font-semibold text-white">Extracted Data</h3>
-          <p className="text-xs text-white/60">
-            {isHindiMode ? '🇮🇳 Hindi Mode (Click "English" to revert)' : 'Structured data'}
+          <h3 className="font-semibold text-earth">Extracted Data</h3>
+          <p className="text-xs text-earth-muted">
+            {isHindiMode ? '🇮🇳 Hindi Mode' : 'Structured data'}
           </p>
         </div>
         <div className="flex space-x-2 flex-wrap">
@@ -145,27 +132,21 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
             <span>Add Row</span>
           </button>
 
-          <div className="h-6 w-px bg-white/20 mx-1 self-center hidden sm:block"></div>
+          <div className="h-6 w-px bg-black/20 mx-1 self-center hidden sm:block"></div>
 
-          {/* Language Toggle Buttons */}
           {isHindiMode && originalRows ? (
             <button
               onClick={handleRevertToEnglish}
               className="btn-glass flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium"
-              title="Revert back to English text"
             >
               <Undo2 className="w-3.5 h-3.5" />
-              <span>English (Revert)</span>
+              <span>English</span>
             </button>
           ) : (
             <button
               onClick={handleConvertToHindi}
               disabled={isTransliterating || rows.length === 0}
-              className={`
-                btn-glass flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium
-                ${isTransliterating || rows.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}
-              `}
-              title="Convert English names to Hindi (Devanagari)"
+              className={`btn-glass flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium ${isTransliterating || rows.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isTransliterating ? (
                 <>
@@ -175,7 +156,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
               ) : (
                 <>
                   <Languages className="w-3.5 h-3.5" />
-                  <span>हिंदी में बदलें</span>
+                  <span>हिंदी</span>
                 </>
               )}
             </button>
@@ -183,7 +164,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
 
           <button
             onClick={handleExportXLSX}
-            className="btn-groundswell flex items-center space-x-1.5 px-4 py-1.5 text-xs"
+            className="btn-farmer flex items-center space-x-1.5 px-4 py-1.5 text-xs"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
             <span>Export Excel</span>
@@ -191,9 +172,8 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
         </div>
       </div>
 
-      {/* Error Message */}
       {transliterationError && (
-        <div className="px-6 py-2 bg-red-500/20 border-b border-red-500/30 text-red-200 text-xs">
+        <div className="px-6 py-2 bg-red-500/10 border-b border-red-500/20 text-red-600 text-xs">
           {transliterationError}
         </div>
       )}
@@ -204,9 +184,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
           <thead>
             <tr>
               {headers.map((header, i) => (
-                <th key={i} className="whitespace-nowrap">
-                  {header}
-                </th>
+                <th key={i} className="whitespace-nowrap">{header}</th>
               ))}
               <th className="w-10"></th>
             </tr>
@@ -228,7 +206,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
                 <td className="text-center w-10">
                   <button
                     onClick={() => handleDeleteRow(rowIndex)}
-                    className="p-1 text-white/30 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                    className="p-1 text-earth-muted hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -237,7 +215,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={headers.length + 1} className="text-center py-10 text-white/40 text-sm">
+                <td colSpan={headers.length + 1} className="text-center py-10 text-earth-muted text-sm">
                   No data extracted. Add a row or upload an image.
                 </td>
               </tr>

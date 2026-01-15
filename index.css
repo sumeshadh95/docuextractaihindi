@@ -1,116 +1,174 @@
-/* Groundswell International Theme - Glassmorphic Design */
+/* Farmer Theme - Neo Crystal Design with Earth Tones */
 
 /* Import font as backup */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
-/* Root variables */
+/* Root variables - Light Mode */
 :root {
-  --gs-teal: #4A7A7B;
-  --gs-teal-dark: #3D6566;
-  --gs-teal-light: #5D9A9B;
-  --gs-green: #78B84A;
-  --gs-green-dark: #5E9A38;
-  --gs-brown: #5C4033;
-  --gs-glass-bg: rgba(255, 255, 255, 0.15);
-  --gs-glass-border: rgba(255, 255, 255, 0.3);
-  --gs-glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --earth-brown: #5C4033;
+  --earth-brown-dark: #3D2B22;
+  --earth-brown-light: #8B6914;
+  --leaf-green: #4A7A3D;
+  --leaf-green-light: #6B9B5E;
+  --leaf-green-dark: #2D5A22;
+  --soil-dark: #2C1810;
+  --cream: #F5F0E8;
+  --cream-dark: #E8DFD0;
+  --glass-bg-light: rgba(92, 64, 51, 0.12);
+  --glass-bg-dark: rgba(0, 0, 0, 0.4);
+  --glass-border: rgba(139, 105, 20, 0.3);
+  --glass-shadow: 0 8px 32px 0 rgba(44, 24, 16, 0.37);
 }
 
-/* Topographic background pattern */
+/* Light mode background - Warm earth with topographic pattern */
 body {
   font-family: 'Montserrat', sans-serif;
-  background-color: var(--gs-teal);
-  background-image: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='2' d='M0 350 Q 250 300 500 350 T 1000 350'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='2' d='M0 400 Q 200 350 400 400 T 800 400 T 1000 400'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='2' d='M0 500 Q 300 450 600 500 T 1000 500'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='2' d='M0 600 Q 250 550 500 600 T 1000 600'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='2' d='M0 700 Q 200 650 400 700 T 800 700 T 1000 700'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='2' d='M0 200 Q 300 150 600 200 T 1000 200'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='2' d='M0 100 Q 250 50 500 100 T 1000 100'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='2' d='M0 800 Q 300 750 600 800 T 1000 800'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='2' d='M0 900 Q 250 850 500 900 T 1000 900'/%3E%3C/svg%3E");
+  background-color: #E8DFD0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'%3E%3Cpath fill='none' stroke='rgba(92,64,51,0.08)' stroke-width='2' d='M0 350 Q 250 300 500 350 T 1000 350'/%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.06)' stroke-width='2' d='M0 400 Q 200 350 400 400 T 800 400 T 1000 400'/%3E%3Cpath fill='none' stroke='rgba(92,64,51,0.08)' stroke-width='2' d='M0 500 Q 300 450 600 500 T 1000 500'/%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.05)' stroke-width='2' d='M0 600 Q 250 550 500 600 T 1000 600'/%3E%3Cpath fill='none' stroke='rgba(92,64,51,0.07)' stroke-width='2' d='M0 700 Q 200 650 400 700 T 800 700 T 1000 700'/%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.06)' stroke-width='2' d='M0 200 Q 300 150 600 200 T 1000 200'/%3E%3Cpath fill='none' stroke='rgba(92,64,51,0.08)' stroke-width='2' d='M0 100 Q 250 50 500 100 T 1000 100'/%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.05)' stroke-width='2' d='M0 800 Q 300 750 600 800 T 1000 800'/%3E%3Cpath fill='none' stroke='rgba(92,64,51,0.07)' stroke-width='2' d='M0 900 Q 250 850 500 900 T 1000 900'/%3E%3C/svg%3E");
   background-size: cover;
   background-attachment: fixed;
   min-height: 100vh;
+  color: #3D2B22;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Glassmorphic card */
+/* Dark mode background */
+body.dark {
+  background-color: #1A1210;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.15)' stroke-width='2' d='M0 350 Q 250 300 500 350 T 1000 350'/%3E%3Cpath fill='none' stroke='rgba(139,105,20,0.1)' stroke-width='2' d='M0 400 Q 200 350 400 400 T 800 400 T 1000 400'/%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.12)' stroke-width='2' d='M0 500 Q 300 450 600 500 T 1000 500'/%3E%3Cpath fill='none' stroke='rgba(139,105,20,0.08)' stroke-width='2' d='M0 600 Q 250 550 500 600 T 1000 600'/%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.1)' stroke-width='2' d='M0 700 Q 200 650 400 700 T 800 700 T 1000 700'/%3E%3Cpath fill='none' stroke='rgba(139,105,20,0.1)' stroke-width='2' d='M0 200 Q 300 150 600 200 T 1000 200'/%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.12)' stroke-width='2' d='M0 100 Q 250 50 500 100 T 1000 100'/%3E%3Cpath fill='none' stroke='rgba(139,105,20,0.08)' stroke-width='2' d='M0 800 Q 300 750 600 800 T 1000 800'/%3E%3Cpath fill='none' stroke='rgba(74,122,61,0.1)' stroke-width='2' d='M0 900 Q 250 850 500 900 T 1000 900'/%3E%3C/svg%3E");
+  color: #E8DFD0;
+}
+
+/* Neo Crystal Glass Card - Light Mode */
 .glass-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(139, 105, 20, 0.2);
   border-radius: 24px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  box-shadow:
+    0 8px 32px 0 rgba(44, 24, 16, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+body.dark .glass-card {
+  background: rgba(30, 20, 15, 0.75);
+  border: 1px solid rgba(74, 122, 61, 0.3);
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .glass-card-sm {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(139, 105, 20, 0.15);
   border-radius: 16px;
-  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.25);
+  box-shadow: 0 4px 16px 0 rgba(44, 24, 16, 0.1);
+  transition: all 0.3s ease;
+}
+
+body.dark .glass-card-sm {
+  background: rgba(30, 20, 15, 0.6);
+  border: 1px solid rgba(74, 122, 61, 0.2);
 }
 
 /* Glass header bar */
 .glass-header {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(92, 64, 51, 0.9);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+  box-shadow: 0 4px 16px rgba(44, 24, 16, 0.2);
+  transition: all 0.3s ease;
 }
 
-/* Groundswell green button */
-.btn-groundswell {
-  background: linear-gradient(135deg, #78B84A 0%, #5E9A38 100%);
+body.dark .glass-header {
+  background: rgba(26, 18, 16, 0.95);
+  border-bottom: 1px solid rgba(74, 122, 61, 0.3);
+}
+
+/* Farmer Green Button */
+.btn-farmer {
+  background: linear-gradient(135deg, #4A7A3D 0%, #2D5A22 100%);
   border-radius: 9999px;
   color: white;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   transition: all 0.3s ease;
   border: none;
-  box-shadow: 0 4px 15px rgba(120, 184, 74, 0.4);
+  box-shadow: 0 4px 15px rgba(74, 122, 61, 0.4);
 }
 
-.btn-groundswell:hover {
+.btn-farmer:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(120, 184, 74, 0.5);
-  background: linear-gradient(135deg, #8DC95B 0%, #6BAB42 100%);
+  box-shadow: 0 6px 20px rgba(74, 122, 61, 0.5);
+  background: linear-gradient(135deg, #5E9A4E 0%, #3D7030 100%);
 }
 
-.btn-groundswell:active {
+.btn-farmer:active {
   transform: translateY(0);
+}
+
+.btn-farmer:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Secondary glass button */
 .btn-glass {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(92, 64, 51, 0.15);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(92, 64, 51, 0.3);
   border-radius: 9999px;
-  color: white;
+  color: #5C4033;
   font-weight: 500;
   padding: 0.75rem 1.5rem;
   transition: all 0.3s ease;
 }
 
+body.dark .btn-glass {
+  background: rgba(74, 122, 61, 0.15);
+  border: 1px solid rgba(74, 122, 61, 0.3);
+  color: #E8DFD0;
+}
+
 .btn-glass:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(92, 64, 51, 0.25);
   transform: translateY(-1px);
+}
+
+body.dark .btn-glass:hover {
+  background: rgba(74, 122, 61, 0.25);
 }
 
 /* Upload drop zone */
 .upload-dropzone {
-  border: 2px dashed rgba(255, 255, 255, 0.5);
+  border: 2px dashed rgba(92, 64, 51, 0.4);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
 }
 
+body.dark .upload-dropzone {
+  border-color: rgba(74, 122, 61, 0.4);
+  background: rgba(0, 0, 0, 0.2);
+}
+
 .upload-dropzone:hover {
-  border-color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(74, 122, 61, 0.6);
+  background: rgba(74, 122, 61, 0.1);
 }
 
 .upload-dropzone.active {
-  border-color: #78B84A;
-  background: rgba(120, 184, 74, 0.1);
+  border-color: #4A7A3D;
+  background: rgba(74, 122, 61, 0.15);
 }
 
 /* Table styles */
@@ -121,12 +179,17 @@ body {
 }
 
 .glass-table thead th {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(92, 64, 51, 0.8);
   color: white;
   font-weight: 600;
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+}
+
+body.dark .glass-table thead th {
+  background: rgba(30, 20, 15, 0.9);
+  border-bottom: 1px solid rgba(74, 122, 61, 0.3);
 }
 
 .glass-table thead th:first-child {
@@ -142,13 +205,22 @@ body {
 }
 
 .glass-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(74, 122, 61, 0.1);
+}
+
+body.dark .glass-table tbody tr:hover {
+  background: rgba(74, 122, 61, 0.15);
 }
 
 .glass-table tbody td {
   padding: 0.875rem 1rem;
-  color: white;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #3D2B22;
+  border-bottom: 1px solid rgba(92, 64, 51, 0.1);
+}
+
+body.dark .glass-table tbody td {
+  color: #E8DFD0;
+  border-bottom: 1px solid rgba(74, 122, 61, 0.15);
 }
 
 .glass-table tbody tr:last-child td {
@@ -163,70 +235,97 @@ body {
   border-radius: 0 0 12px 0;
 }
 
-/* Text colors for glass */
-.text-glass {
-  color: rgba(255, 255, 255, 0.9);
+/* Text colors */
+.text-earth {
+  color: #5C4033;
 }
 
-.text-glass-muted {
-  color: rgba(255, 255, 255, 0.7);
+body.dark .text-earth {
+  color: #E8DFD0;
+}
+
+.text-earth-muted {
+  color: rgba(92, 64, 51, 0.7);
+}
+
+body.dark .text-earth-muted {
+  color: rgba(232, 223, 208, 0.7);
 }
 
 /* Input styling */
 .glass-input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(92, 64, 51, 0.2);
   border-radius: 12px;
-  color: white;
+  color: #3D2B22;
   padding: 0.75rem 1rem;
   transition: all 0.2s ease;
 }
 
+body.dark .glass-input {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(74, 122, 61, 0.3);
+  color: #E8DFD0;
+}
+
 .glass-input:focus {
   outline: none;
-  border-color: #78B84A;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(120, 184, 74, 0.2);
+  border-color: #4A7A3D;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(74, 122, 61, 0.2);
+}
+
+body.dark .glass-input:focus {
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .glass-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(92, 64, 51, 0.5);
 }
 
-/* Tab styling */
-.glass-tab {
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.6);
-  padding: 0.75rem 1.25rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  border-radius: 12px 12px 0 0;
-}
-
-.glass-tab:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.glass-tab.active {
-  color: white;
-  background: rgba(255, 255, 255, 0.15);
-  border-bottom: 2px solid #78B84A;
+body.dark .glass-input::placeholder {
+  color: rgba(232, 223, 208, 0.5);
 }
 
 /* Progress bar */
 .progress-bar-bg {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(92, 64, 51, 0.2);
   border-radius: 9999px;
   overflow: hidden;
 }
 
+body.dark .progress-bar-bg {
+  background: rgba(74, 122, 61, 0.2);
+}
+
 .progress-bar-fill {
-  background: linear-gradient(90deg, #78B84A 0%, #5E9A38 100%);
+  background: linear-gradient(90deg, #4A7A3D 0%, #6B9B5E 100%);
   height: 100%;
   transition: width 0.3s ease;
   border-radius: 9999px;
+}
+
+/* Dark mode toggle */
+.dark-mode-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(92, 64, 51, 0.2);
+  border-radius: 9999px;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+body.dark .dark-mode-toggle {
+  background: rgba(74, 122, 61, 0.2);
+  border-color: rgba(74, 122, 61, 0.3);
+}
+
+.dark-mode-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+body.dark .dark-mode-toggle:hover {
+  background: rgba(74, 122, 61, 0.3);
 }
 
 /* Scrollbar styling */
@@ -236,29 +335,53 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(92, 64, 51, 0.1);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(92, 64, 51, 0.3);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(92, 64, 51, 0.4);
+}
+
+body.dark ::-webkit-scrollbar-track {
+  background: rgba(74, 122, 61, 0.1);
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  background: rgba(74, 122, 61, 0.3);
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 122, 61, 0.4);
 }
 
 /* Animation for loading */
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(120, 184, 74, 0.4);
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(74, 122, 61, 0.4);
   }
+
   50% {
-    box-shadow: 0 0 20px rgba(120, 184, 74, 0.6);
+    box-shadow: 0 0 20px rgba(74, 122, 61, 0.6);
   }
 }
 
 .animate-pulse-glow {
   animation: pulse-glow 2s infinite;
+}
+
+/* Farmer icon styling */
+.farmer-icon {
+  color: #4A7A3D;
+}
+
+body.dark .farmer-icon {
+  color: #6B9B5E;
 }

@@ -49,20 +49,20 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFi
 
   if (selectedFile) {
     return (
-      <div className="relative w-full p-6 border border-white/30 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-between">
+      <div className="relative w-full p-6 glass-card-sm flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-white/20 rounded-lg border border-white/20">
-            <FileImage className="w-8 h-8 text-gs-green" />
+          <div className="p-3 bg-black/5 rounded-lg">
+            <FileImage className="w-8 h-8 farmer-icon" />
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{selectedFile.name}</p>
-            <p className="text-xs text-white/60">{(selectedFile.size / 1024).toFixed(2)} KB</p>
+            <p className="text-sm font-medium text-earth">{selectedFile.name}</p>
+            <p className="text-xs text-earth-muted">{(selectedFile.size / 1024).toFixed(2)} KB</p>
           </div>
         </div>
         <button
           onClick={onClear}
           disabled={disabled}
-          className="p-2 hover:bg-white/20 rounded-full transition-colors text-white/60 hover:text-red-400"
+          className="p-2 hover:bg-black/10 rounded-full transition-colors text-earth-muted hover:text-red-500"
         >
           <X className="w-5 h-5" />
         </button>
@@ -91,14 +91,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFi
         className="hidden"
         disabled={disabled}
       />
-      <div className="p-4 bg-white/10 rounded-full">
-        <Upload className={`w-8 h-8 ${isDragging ? 'text-gs-green' : 'text-white/50'}`} />
+      <div className="p-4 bg-black/5 rounded-full">
+        <Upload className={`w-8 h-8 ${isDragging ? 'farmer-icon' : 'text-earth-muted'}`} />
       </div>
       <div className="text-center">
-        <p className="text-base font-semibold text-white">
+        <p className="text-base font-semibold text-earth">
           Click to upload or drag and drop
         </p>
-        <p className="text-sm text-white/60 mt-1">
+        <p className="text-sm text-earth-muted mt-1">
           Supported formats: PNG, JPG, JPEG, WEBP
         </p>
       </div>
