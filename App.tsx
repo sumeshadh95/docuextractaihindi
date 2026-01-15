@@ -138,25 +138,25 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {/* Farmer Icon */}
-            <div className="p-2 bg-white/5 border border-white/5 rounded-xl">
-              <Wheat className="w-7 h-7 text-white" />
+            <div className="p-2 glass-card-sm">
+              <Wheat className="w-7 h-7 farmer-icon" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">Farmer OCR</h1>
-              <p className="text-xs text-white/70">Data Extraction Tool</p>
+              <h1 className="text-lg font-bold text-earth">Farmer OCR</h1>
+              <p className="text-xs text-earth-muted">Data Extraction Tool</p>
             </div>
           </div>
 
           {/* Dark Mode Toggle */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="p-2 bg-white/5 border border-white/5 rounded-full hover:bg-white/10 transition-colors"
+            className="dark-mode-toggle"
             title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {darkMode ? (
               <Sun className="w-5 h-5 text-yellow-400" />
             ) : (
-              <Moon className="w-5 h-5 text-white" />
+              <Moon className="w-5 h-5 text-earth-muted" />
             )}
           </button>
         </div>
@@ -383,7 +383,7 @@ const App: React.FC = () => {
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 glass-footer py-3 z-40">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-xs text-white/70">
+          <p className="text-xs text-earth-muted">
             © 2024 Farmer OCR • Agricultural Data Collection Tool
           </p>
         </div>

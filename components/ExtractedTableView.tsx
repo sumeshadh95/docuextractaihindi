@@ -108,9 +108,9 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header Bar */}
-      <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/2">
+      <div className="px-6 py-4 border-b flex justify-between items-center" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-secondary)' }}>
         <div>
-          <h3 className="font-semibold text-white">Extracted Data</h3>
+          <h3 className="font-semibold text-earth">Extracted Data</h3>
           <p className="text-xs text-earth-muted">
             {isHindiMode ? '🇮🇳 Hindi Mode' : 'Structured data'}
           </p>
@@ -132,7 +132,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
             <span>Add Row</span>
           </button>
 
-          <div className="h-6 w-px bg-white/10 mx-1 self-center hidden sm:block"></div>
+          <div className="h-6 w-px mx-1 self-center hidden sm:block" style={{ background: 'var(--border-color)' }}></div>
 
           {isHindiMode && originalRows ? (
             <button
@@ -173,7 +173,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
       </div>
 
       {transliterationError && (
-        <div className="px-6 py-2 bg-red-500/10 border-b border-red-500/20 text-red-400 text-xs">
+        <div className="px-6 py-2 bg-red-500/10 border-b border-red-500/20 text-red-600 text-xs">
           {transliterationError}
         </div>
       )}
@@ -206,7 +206,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
                 <td className="text-center w-10">
                   <button
                     onClick={() => handleDeleteRow(rowIndex)}
-                    className="p-1 text-earth-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                    className="p-1 text-earth-muted hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

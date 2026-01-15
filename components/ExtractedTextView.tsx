@@ -17,9 +17,9 @@ export const ExtractedTextView: React.FC<ExtractedTextViewProps> = ({ text, onTe
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/2">
+      <div className="px-6 py-4 border-b flex justify-between items-center" style={{ borderColor: 'var(--border-color)' }}>
         <div>
-          <h3 className="font-semibold text-white">Extracted Narrative</h3>
+          <h3 className="font-semibold text-earth">Extracted Narrative</h3>
           <p className="text-xs text-earth-muted">Headings, paragraphs, instructions</p>
         </div>
         <button
