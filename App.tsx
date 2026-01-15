@@ -42,7 +42,7 @@ const App: React.FC = () => {
 
   // Headers
   const [headers, setHeaders] = useState<string[]>([
-    "S.No.",
+    "क्र संख्या",
     "भी.आर.पी नाम",
     "Code",
     "किसान नाम",
@@ -209,8 +209,8 @@ const App: React.FC = () => {
               <button
                 onClick={() => { setInputMode('image'); handleClearFile(); }}
                 className={`flex-1 flex items-center justify-center space-x-2 py-2.5 rounded-md text-sm font-medium transition-all ${inputMode === 'image'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-800'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-800'
                   }`}
               >
                 <Image className="w-4 h-4" />
@@ -219,8 +219,8 @@ const App: React.FC = () => {
               <button
                 onClick={() => { setInputMode('pdf'); handleClearFile(); }}
                 className={`flex-1 flex items-center justify-center space-x-2 py-2.5 rounded-md text-sm font-medium transition-all ${inputMode === 'pdf'
-                    ? 'bg-red-600 text-white shadow-md'
-                    : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-800'
+                  ? 'bg-red-600 text-white shadow-md'
+                  : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-800'
                   }`}
               >
                 <FileText className="w-4 h-4" />
@@ -361,8 +361,8 @@ const App: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('table')}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'table'
-                        ? darkMode ? 'bg-slate-700 text-blue-400 shadow-sm' : 'bg-white text-blue-600 shadow-sm'
-                        : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700'
+                      ? darkMode ? 'bg-slate-700 text-blue-400 shadow-sm' : 'bg-white text-blue-600 shadow-sm'
+                      : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700'
                       }`}
                   >
                     <Database className="w-4 h-4" />
@@ -371,8 +371,8 @@ const App: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('text')}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'text'
-                        ? darkMode ? 'bg-slate-700 text-blue-400 shadow-sm' : 'bg-white text-blue-600 shadow-sm'
-                        : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700'
+                      ? darkMode ? 'bg-slate-700 text-blue-400 shadow-sm' : 'bg-white text-blue-600 shadow-sm'
+                      : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700'
                       }`}
                   >
                     <Layout className="w-4 h-4" />

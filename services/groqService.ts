@@ -3,21 +3,23 @@ import { SYSTEM_PROMPT } from "../constants";
 
 // Semantic header mappings for flexible column matching
 const HEADER_ALIASES: { [key: string]: string[] } = {
-    "S.No.": ["S.No", "S.NO", "S.NO.", "क्र.सं.", "क्रम", "क्रम संख्या", "Serial", "Serial No", "Sl.No", "Sl. No.", "क्र."],
-    "भी.आर.पी नाम": ["भी.आर.पी नाम", "VRP Name", "BRP Name", "VRP नाम", "भी.आर.पी.", "VRP"],
-    "Code": ["Code", "CODE", "कोड", "CHF Code", "CHF", "Farmer Code", "किसान कोड"],
-    "किसान नाम": ["किसान नाम", "Farmer Name", "किसान का नाम", "Name", "नाम", "Farmer's Name", "किसान"],
+    "क्र संख्या": ["क्र संख्या", "क्र.संख्या", "क्र.सं.", "क्रम", "क्रम संख्या", "S.No", "S.NO", "S.NO.", "S.No.", "Serial", "Serial No", "Sl.No", "Sl. No.", "क्र.", "क्रमांक"],
+    "भी.आर.पी नाम": ["भी.आर.पी नाम", "भी.आर.पी. नाम", "VRP Name", "BRP Name", "VRP नाम", "भी.आर.पी.", "VRP", "BRP"],
+    "Code": ["Code", "CODE", "कोड", "CHF Code", "CHF", "Farmer Code", "किसान कोड", "CHF."],
+    "किसान नाम": ["किसान नाम", "किसान का नाम", "किसान दीदी का नाम", "किसान दीदी नाम", "Farmer Name", "Farmer's Name", "Name", "नाम", "किसान", "Kisan Name", "Kisan Naam", "किसान दीदी"],
     "पति/पिता का नाम": [
-        "पति/पिता का नाम", "पति/पिता", "Father Name", "Father's Name", "Husband Name", "Husband's Name",
-        "Father/Husband Name", "पिता का नाम", "पिता/पति का नाम", "पति का नाम", "Parent Name",
-        "Guardian Name", "S/O", "D/O", "W/O", "पिता", "पति"
+        "पति/पिता का नाम", "पति/पिता", "पति / पिता का नाम", "पति पिता का नाम",
+        "Father Name", "Father's Name", "Husband Name", "Husband's Name",
+        "Father/Husband Name", "पिता का नाम", "पिता/पति का नाम", "पति का नाम",
+        "Parent Name", "Guardian Name", "S/O", "D/O", "W/O", "पिता", "पति",
+        "पिता नाम", "Pita Ka Naam", "Pati Ka Naam"
     ],
-    "गाँव": ["गाँव", "Village", "गांव", "ग्राम", "Village Name", "Address", "पता", "Gaon"],
+    "गाँव": ["गाँव", "गांव", "Village", "ग्राम", "Village Name", "Address", "पता", "Gaon", "Gram"],
     "फसल": ["फसल", "Crop", "Crop Name", "Fasal", "फसल का नाम"],
-    "क्षेत्रफल (कट्ठा)": ["क्षेत्रफल (कट्ठा)", "क्षेत्रफल", "Area", "Area (Katha)", "Area (कट्ठा)", "Katha", "कट्ठा", "क्षेत्र"],
-    "रोपाई/बुआई तिथि": ["रोपाई/बुआई तिथि", "Date", "Sowing Date", "Transplanting Date", "रोपाई तिथि", "बुआई तिथि", "तिथि", "तारीख"],
-    "कुल तोड़ाई (Kg)": ["कुल तोड़ाई (Kg)", "कुल तोड़ाई", "Total Production", "Production", "उत्पादन", "Kg", "तोड़ाई", "Harvest"],
-    "कुल आमदनी (रु०)": ["कुल आमदनी (रु०)", "कुल आमदनी", "Total Income", "Income", "आमदनी", "रु०", "Rs", "Amount", "राशि"]
+    "क्षेत्रफल (कट्ठा)": ["क्षेत्रफल (कट्ठा)", "क्षेत्रफल", "Area", "Area (Katha)", "Area (कट्ठा)", "Katha", "कट्ठा", "क्षेत्र", "Kshetrafal"],
+    "रोपाई/बुआई तिथि": ["रोपाई/बुआई तिथि", "रोपाई तिथि", "बुआई तिथि", "Date", "Sowing Date", "Transplanting Date", "तिथि", "तारीख", "Tithi"],
+    "कुल तोड़ाई (Kg)": ["कुल तोड़ाई (Kg)", "कुल तोड़ाई", "Total Production", "Production", "उत्पादन", "Kg", "तोड़ाई", "Harvest", "Todai"],
+    "कुल आमदनी (रु०)": ["कुल आमदनी (रु०)", "कुल आमदनी", "Total Income", "Income", "आमदनी", "रु०", "Rs", "Amount", "राशि", "Aamdani"]
 };
 
 export const extractDataFromImage = async (
@@ -37,27 +39,37 @@ export const extractDataFromImage = async (
     const prompt = `
     ${SYSTEM_PROMPT}
     
-    CRITICAL EXTRACTION RULES:
-    1. Extract the ACTUAL VALUES from the document, NOT the column headers themselves.
-    2. For "पति/पिता का नाम" (Father/Husband Name) column - extract the ACTUAL names of fathers/husbands from the document data rows, NOT the header text.
-    3. If a column in the document has different heading than our target headers, map the DATA correctly based on semantic meaning.
-    4. NEVER put a column header as a cell value. Each cell should contain actual data from the document.
-    5. If a field's value is genuinely not present or illegible, use an empty string "".
+    ⚠️ CRITICAL: STRICT OCR EXTRACTION - NO HALLUCINATION ALLOWED ⚠️
     
-    IMPORTANT: You must return ONLY valid JSON matching this structure:
+    You are performing OCR on a handwritten Hindi document. Your ONLY job is to READ and TRANSCRIBE what is ACTUALLY WRITTEN in the document.
+    
+    ABSOLUTE RULES - VIOLATION IS UNACCEPTABLE:
+    1. ONLY extract text that is PHYSICALLY VISIBLE in the image - do NOT invent, guess, or fabricate ANY data.
+    2. If handwriting is unclear, transcribe your BEST interpretation of what's written - do NOT make up different names.
+    3. DO NOT generate random or made-up Hindi names. Every name must come from the actual document.
+    4. If a cell is empty or illegible, use "" (empty string) - do NOT fill it with invented data.
+    5. "किसान दीदी का नाम" means "Female Farmer's Name" - these are women farmers, transcribe their actual names.
+    6. Column headers should NEVER appear as cell values.
+    
+    READ THE ACTUAL HANDWRITING:
+    - Look at each row carefully
+    - Transcribe the EXACT Hindi text written there
+    - Do not substitute with different names
+    - Preserve the actual spelling from the document
+    
+    Return ONLY valid JSON:
     {
-      "document_type_guess": "string describing the document type",
-      "extracted_text": "any narrative/paragraph text from the document",
+      "document_type_guess": "NGO Farmer Registration/Data Collection Form",
+      "extracted_text": "any header text or narrative from the document",
       "extracted_table": [
-        { ${headers.map(h => `"${h}": "actual_extracted_value_not_header"`).join(", ")} }
+        { ${headers.map(h => `"${h}": "exact_text_from_document"`).join(", ")} }
       ],
-      "warnings": ["optional array of warnings"]
+      "warnings": ["any issues with legibility"]
     }
     
-    Map the extracted data EXACTLY to these target headers: 
-    ${JSON.stringify(headers)}
+    Target headers to map data to: ${JSON.stringify(headers)}
     
-    REMEMBER: Extract REAL DATA VALUES, not column headers!
+    ⚠️ REMEMBER: TRANSCRIBE ONLY WHAT YOU SEE. NO FABRICATION! ⚠️
   `;
 
     try {
