@@ -98,6 +98,14 @@ body {
   z-index: 50;
 }
 
+/* Glass Footer - No positioning conflicts */
+.glass-footer {
+  background: rgba(15, 10, 8, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 /* Buttons - Hyperflow style (Gradient Text or Glow) */
 .btn-farmer {
   background: linear-gradient(135deg, #4A7A3D 0%, #6B9B5E 100%);

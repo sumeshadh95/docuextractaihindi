@@ -381,7 +381,7 @@ const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 glass-header py-3">
+      <footer className="fixed bottom-0 left-0 right-0 glass-footer py-3 z-40">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-xs text-white/70">
             © 2024 Farmer OCR • Agricultural Data Collection Tool
