@@ -7,17 +7,6 @@ import { extractDataFromImage } from './services/groqService';
 import { ExtractionResult, DynamicRow, ProcessingStatus } from './types';
 import { Sparkles, Layout, Database, AlertCircle, ScanText, Moon, Sun, Image, FileText } from 'lucide-react';
 
-// Simple hash function for caching
-const hashString = (str: string): string => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return hash.toString(36);
-};
-
 const App: React.FC = () => {
   // Input mode
   const [inputMode, setInputMode] = useState<'image' | 'pdf'>('image');
@@ -110,28 +99,9 @@ const App: React.FC = () => {
       const base64Data = imagePreview.split(',')[1];
       const mimeType = 'image/png';
 
-      // Check cache
-      const cacheKey = `cache_${hashString(base64Data.substring(0, 1000))}`;
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        const cachedResult = JSON.parse(cached) as ExtractionResult;
-        setResult(cachedResult);
-        setStatus(ProcessingStatus.SUCCESS);
-        setProgress(100);
-        if (cachedResult.extracted_table.length > 0) setActiveTab('table');
-        return;
-      }
-
       setProgress(30);
       const extractionResult = await extractDataFromImage(base64Data, mimeType, headers);
       setProgress(90);
-
-      // Cache result
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify(extractionResult));
-      } catch (e) {
-        console.warn("Cache storage failed:", e);
-      }
 
       setResult(extractionResult);
       setStatus(ProcessingStatus.SUCCESS);
