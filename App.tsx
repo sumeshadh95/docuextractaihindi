@@ -3,7 +3,7 @@ import { FileUpload } from './components/FileUpload';
 import { ExtractedTextView } from './components/ExtractedTextView';
 import { ExtractedTableView } from './components/ExtractedTableView';
 import { PdfUploadView } from './components/PdfUploadView';
-import { extractDataFromImage } from './services/groqService';
+import { extractDataFromImage } from './services/geminiService';
 import { ExtractionResult, DynamicRow, ProcessingStatus } from './types';
 import { Sparkles, Layout, Database, AlertCircle, ScanText, Moon, Sun, Image, FileText } from 'lucide-react';
 
@@ -129,7 +129,7 @@ const App: React.FC = () => {
     if (result) setResult({ ...result, extracted_table: newRows });
   };
 
-  const canProcess = imagePreview && import.meta.env.VITE_GROQ_API_KEY;
+  const canProcess = imagePreview && import.meta.env.VITE_API_KEY;
 
   return (
     <div className={`min-h-screen font-sans pb-20 transition-colors duration-300 ${darkMode ? 'dark bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
@@ -161,11 +161,11 @@ const App: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* API Key Warning */}
-        {!import.meta.env.VITE_GROQ_API_KEY && (
+        {!import.meta.env.VITE_API_KEY && (
           <div className={`mb-6 rounded-lg p-4 flex items-start space-x-3 ${darkMode ? 'bg-red-900/30 border border-red-800 text-red-300' : 'bg-red-50 border border-red-200 text-red-800'}`}>
             <AlertCircle className="w-5 h-5 mt-0.5" />
             <div className="text-sm">
-              <strong>Missing API Key:</strong> Set <code>VITE_GROQ_API_KEY</code> in <code>.env.local</code>.
+              <strong>Missing API Key:</strong> Set <code>VITE_API_KEY</code> (Google Gemini) in <code>.env.local</code>.
             </div>
           </div>
         )}
