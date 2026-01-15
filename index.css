@@ -413,3 +413,121 @@ h4,
     padding: 0.625rem 1.25rem;
   }
 }
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 1024px) {
+  .glass-card {
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .glass-card {
+    border-radius: 16px;
+    padding: 1rem;
+  }
+
+  .glass-card-sm {
+    border-radius: 12px;
+  }
+
+  .btn-farmer {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-glass {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .glass-input {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .upload-dropzone {
+    padding: 2rem 1rem;
+  }
+
+  .glass-table thead th,
+  .glass-table tbody td {
+    padding: 0.625rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-card {
+    border-radius: 12px;
+  }
+
+  .btn-farmer {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .dark-mode-toggle {
+    padding: 0.375rem;
+  }
+}
+
+/* Sidebar slide animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* History item hover effect */
+.history-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.history-item:hover {
+  transform: translateX(-4px);
+}
+
+/* Batch file list animation */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.batch-file-item {
+  animation: fadeSlideIn 0.2s ease-out;
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+
+  .btn-farmer,
+  .btn-glass,
+  .dark-mode-toggle {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

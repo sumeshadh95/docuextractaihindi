@@ -1,15 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FileUpload } from './components/FileUpload';
 import { ExtractedTextView } from './components/ExtractedTextView';
 import { ExtractedTableView } from './components/ExtractedTableView';
 import { PdfUploadView } from './components/PdfUploadView';
+import { HistorySidebar, HistoryEntry } from './components/HistorySidebar';
+import { RateLimitIndicator, getUsageToday, incrementUsage, DAILY_LIMIT } from './components/RateLimitIndicator';
 import { extractDataFromImage } from './services/geminiService';
 import { ExtractionResult, DynamicRow, ProcessingStatus } from './types';
-import { Sparkles, Layout, Database, AlertCircle, Image, FileText, Sun, Moon, Wheat } from 'lucide-react';
+import { Sparkles, Layout, Database, AlertCircle, Image, FileText, Sun, Moon, Wheat, History, Layers } from 'lucide-react';
+
+// Simple hash for caching
+const hashString = async (str: string): Promise<string> => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str.slice(0, 10000)); // First 10KB for speed
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+};
 
 const App: React.FC = () => {
   // Input mode
-  const [inputMode, setInputMode] = useState<'image' | 'pdf'>('image');
+  const [inputMode, setInputMode] = useState<'image' | 'pdf' | 'batch'>('image');
 
   // Dark mode
   const [darkMode, setDarkMode] = useState(() => {
@@ -17,8 +28,12 @@ const App: React.FC = () => {
     return saved === 'true';
   });
 
+  // Sidebar
+  const [historySidebarOpen, setHistorySidebarOpen] = useState(false);
+
   // Image extraction state
   const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [pdfPageNumber, setPdfPageNumber] = useState<number | null>(null);
 
@@ -28,6 +43,20 @@ const App: React.FC = () => {
   const [result, setResult] = useState<ExtractionResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'table' | 'text'>('table');
+
+  // Batch processing
+  const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
+
+  // History
+  const [history, setHistory] = useState<HistoryEntry[]>(() => {
+    try {
+      const saved = localStorage.getItem('extractionHistory');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  // Rate limiting
+  const [usageToday, setUsageToday] = useState(getUsageToday());
 
   // Headers
   const [headers, setHeaders] = useState<string[]>([
@@ -54,8 +83,30 @@ const App: React.FC = () => {
     localStorage.setItem('darkMode', darkMode.toString());
   }, [darkMode]);
 
+  // Save history to localStorage
+  useEffect(() => {
+    localStorage.setItem('extractionHistory', JSON.stringify(history.slice(0, 20)));
+  }, [history]);
+
+  // Cache helpers
+  const getCachedResult = async (imageData: string): Promise<ExtractionResult | null> => {
+    try {
+      const hash = await hashString(imageData);
+      const cached = localStorage.getItem(`cache_${hash}`);
+      return cached ? JSON.parse(cached) : null;
+    } catch { return null; }
+  };
+
+  const setCachedResult = async (imageData: string, result: ExtractionResult) => {
+    try {
+      const hash = await hashString(imageData);
+      localStorage.setItem(`cache_${hash}`, JSON.stringify(result));
+    } catch { /* ignore cache errors */ }
+  };
+
   const handleFileSelect = (selectedFile: File) => {
     setFile(selectedFile);
+    setFiles([]);
     setErrorMsg(null);
     setResult(null);
     setStatus(ProcessingStatus.IDLE);
@@ -69,6 +120,15 @@ const App: React.FC = () => {
     reader.readAsDataURL(selectedFile);
   };
 
+  const handleFilesSelect = (selectedFiles: File[]) => {
+    setFiles(prev => [...prev, ...selectedFiles]);
+    setFile(null);
+    setImagePreview(null);
+    setErrorMsg(null);
+    setResult(null);
+    setStatus(ProcessingStatus.IDLE);
+  };
+
   const handlePdfPageSelect = (dataUrl: string, pageNumber: number) => {
     setImagePreview(dataUrl);
     setPdfPageNumber(pageNumber);
@@ -80,16 +140,44 @@ const App: React.FC = () => {
 
   const handleClearFile = () => {
     setFile(null);
+    setFiles([]);
     setImagePreview(null);
     setResult(null);
     setStatus(ProcessingStatus.IDLE);
     setErrorMsg(null);
     setProgress(0);
     setPdfPageNumber(null);
+    setBatchProgress(null);
   };
 
+  // Add to history
+  const addToHistory = useCallback((extractionResult: ExtractionResult, preview?: string) => {
+    const entry: HistoryEntry = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      documentType: extractionResult.document_type_guess || 'Unknown',
+      rowCount: extractionResult.extracted_table.length,
+      result: extractionResult,
+      imagePreview: preview?.slice(0, 500) // Truncate for storage
+    };
+    setHistory(prev => [entry, ...prev].slice(0, 20));
+  }, []);
+
+  // Single image processing
   const processImage = async () => {
     if (!imagePreview) return;
+
+    // Check cache first
+    const cached = await getCachedResult(imagePreview);
+    if (cached) {
+      setResult(cached);
+      setStatus(ProcessingStatus.SUCCESS);
+      setProgress(100);
+      addToHistory(cached, imagePreview);
+      if (cached.extracted_table.length > 0) setActiveTab('table');
+      else setActiveTab('text');
+      return;
+    }
 
     setStatus(ProcessingStatus.PROCESSING);
     setErrorMsg(null);
@@ -103,9 +191,19 @@ const App: React.FC = () => {
       const extractionResult = await extractDataFromImage(base64Data, mimeType, headers);
       setProgress(90);
 
+      // Update rate limit
+      const newUsage = incrementUsage();
+      setUsageToday(newUsage);
+
+      // Cache result
+      await setCachedResult(imagePreview, extractionResult);
+
       setResult(extractionResult);
       setStatus(ProcessingStatus.SUCCESS);
       setProgress(100);
+
+      // Add to history
+      addToHistory(extractionResult, imagePreview);
 
       if (extractionResult.extracted_table.length > 0) {
         setActiveTab('table');
@@ -121,6 +219,79 @@ const App: React.FC = () => {
     }
   };
 
+  // Batch processing
+  const processBatch = async () => {
+    if (files.length === 0) return;
+
+    setStatus(ProcessingStatus.PROCESSING);
+    setErrorMsg(null);
+    setBatchProgress({ current: 0, total: files.length });
+
+    const allRows: DynamicRow[] = [];
+    let allText = '';
+    let lastDocType = '';
+
+    for (let i = 0; i < files.length; i++) {
+      setBatchProgress({ current: i + 1, total: files.length });
+      setProgress(Math.round(((i + 1) / files.length) * 100));
+
+      try {
+        // Read file
+        const reader = new FileReader();
+        const dataUrl = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(files[i]);
+        });
+
+        const base64Data = dataUrl.split(',')[1];
+        const extractionResult = await extractDataFromImage(base64Data, 'image/png', headers);
+
+        // Update rate limit
+        const newUsage = incrementUsage();
+        setUsageToday(newUsage);
+
+        allRows.push(...extractionResult.extracted_table);
+        allText += extractionResult.extracted_text + '\n\n---\n\n';
+        lastDocType = extractionResult.document_type_guess || lastDocType;
+
+      } catch (err: any) {
+        console.error(`Error processing file ${i + 1}:`, err);
+      }
+    }
+
+    const mergedResult: ExtractionResult = {
+      extracted_text: allText.trim(),
+      extracted_table: allRows,
+      document_type_guess: lastDocType,
+      warnings: [`Processed ${files.length} images`]
+    };
+
+    setResult(mergedResult);
+    setStatus(ProcessingStatus.SUCCESS);
+    setBatchProgress(null);
+    addToHistory(mergedResult);
+
+    if (allRows.length > 0) setActiveTab('table');
+    else setActiveTab('text');
+  };
+
+  // History actions
+  const handleRestoreHistory = (entry: HistoryEntry) => {
+    setResult(entry.result);
+    setStatus(ProcessingStatus.SUCCESS);
+    setActiveTab(entry.result.extracted_table.length > 0 ? 'table' : 'text');
+    setHistorySidebarOpen(false);
+  };
+
+  const handleDeleteHistory = (id: string) => {
+    setHistory(prev => prev.filter(e => e.id !== id));
+  };
+
+  const handleClearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem('extractionHistory');
+  };
+
   const handleUpdateText = (newText: string) => {
     if (result) setResult({ ...result, extracted_text: newText });
   };
@@ -129,7 +300,9 @@ const App: React.FC = () => {
     if (result) setResult({ ...result, extracted_table: newRows });
   };
 
-  const canProcess = imagePreview && import.meta.env.VITE_API_KEY;
+  const canProcess = inputMode === 'batch'
+    ? files.length > 0 && import.meta.env.VITE_API_KEY
+    : imagePreview && import.meta.env.VITE_API_KEY;
 
   return (
     <div className="min-h-screen pb-20">
@@ -137,75 +310,120 @@ const App: React.FC = () => {
       <header className="glass-header sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            {/* Farmer Icon */}
             <div className="p-2 glass-card-sm">
               <Wheat className="w-7 h-7 farmer-icon" />
             </div>
-            <div>
+            <div className="hidden sm:block">
               <h1 className="text-lg font-bold text-earth">Farmer OCR</h1>
               <p className="text-xs text-earth-muted">Data Extraction Tool</p>
             </div>
           </div>
 
-          {/* Dark Mode Toggle */}
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="dark-mode-toggle"
-            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          >
-            {darkMode ? (
-              <Sun className="w-5 h-5 text-yellow-400" />
-            ) : (
-              <Moon className="w-5 h-5 text-earth-muted" />
-            )}
-          </button>
+          <div className="flex items-center space-x-3">
+            {/* Rate Limit Indicator */}
+            <div className="hidden md:block">
+              <RateLimitIndicator usedToday={usageToday} dailyLimit={DAILY_LIMIT} />
+            </div>
+
+            {/* History Button */}
+            <button
+              onClick={() => setHistorySidebarOpen(true)}
+              className="dark-mode-toggle relative"
+              title="View History"
+            >
+              <History className="w-5 h-5 text-earth-muted" />
+              {history.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 text-white text-[10px] rounded-full flex items-center justify-center">
+                  {history.length}
+                </span>
+              )}
+            </button>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="dark-mode-toggle"
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {darkMode ? (
+                <Sun className="w-5 h-5 text-yellow-400" />
+              ) : (
+                <Moon className="w-5 h-5 text-earth-muted" />
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* History Sidebar */}
+      <HistorySidebar
+        isOpen={historySidebarOpen}
+        onClose={() => setHistorySidebarOpen(false)}
+        history={history}
+        onRestore={handleRestoreHistory}
+        onDelete={handleDeleteHistory}
+        onClearAll={handleClearHistory}
+      />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
+        {/* Mobile Rate Limit */}
+        <div className="md:hidden mb-4">
+          <RateLimitIndicator usedToday={usageToday} dailyLimit={DAILY_LIMIT} />
+        </div>
+
         {/* API Key Warning */}
         {!import.meta.env.VITE_API_KEY && (
           <div className="glass-card-sm mb-6 p-4 flex items-start space-x-3 border-l-4 border-amber-500">
             <AlertCircle className="w-5 h-5 mt-0.5 text-amber-600" />
             <div className="text-sm text-earth">
-              <strong>Missing API Key:</strong> Set <code className="bg-white/10 px-1.5 py-0.5 rounded">VITE_API_KEY</code> in <code className="bg-white/10 px-1.5 py-0.5 rounded">.env.local</code>
+              <strong>Missing API Key:</strong> Set <code className="glass-card-sm px-1.5 py-0.5 rounded text-xs">VITE_API_KEY</code> in <code className="glass-card-sm px-1.5 py-0.5 rounded text-xs">.env.local</code>
             </div>
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
           {/* Left Column: Input */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-4 md:space-y-6">
 
             {/* Mode Selector */}
-            <div className="glass-card-sm p-1.5 flex">
+            <div className="glass-card-sm p-1.5 flex flex-wrap">
               <button
                 onClick={() => { setInputMode('image'); handleClearFile(); }}
-                className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl text-sm font-medium transition-all ${inputMode === 'image'
+                className={`flex-1 flex items-center justify-center space-x-2 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-medium transition-all ${inputMode === 'image'
                   ? 'btn-farmer'
                   : 'text-earth-muted hover:text-earth hover:bg-white/5'
                   }`}
               >
                 <Image className="w-4 h-4" />
-                <span>From Image</span>
+                <span>Image</span>
+              </button>
+              <button
+                onClick={() => { setInputMode('batch'); handleClearFile(); }}
+                className={`flex-1 flex items-center justify-center space-x-2 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-medium transition-all ${inputMode === 'batch'
+                  ? 'btn-farmer'
+                  : 'text-earth-muted hover:text-earth hover:bg-white/5'
+                  }`}
+              >
+                <Layers className="w-4 h-4" />
+                <span>Batch</span>
               </button>
               <button
                 onClick={() => { setInputMode('pdf'); handleClearFile(); }}
-                className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl text-sm font-medium transition-all ${inputMode === 'pdf'
+                className={`flex-1 flex items-center justify-center space-x-2 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-medium transition-all ${inputMode === 'pdf'
                   ? 'btn-farmer'
                   : 'text-earth-muted hover:text-earth hover:bg-white/5'
                   }`}
               >
                 <FileText className="w-4 h-4" />
-                <span>From PDF</span>
+                <span>PDF</span>
               </button>
             </div>
 
             {/* Input Area */}
-            <div className="glass-card p-6">
+            <div className="glass-card p-4 md:p-6">
               {inputMode === 'image' ? (
                 <>
-                  <h2 className="text-lg font-semibold mb-1 text-earth">Upload Document Image</h2>
+                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">Upload Image</h2>
                   <p className="text-xs mb-4 text-earth-muted">
                     Upload a photo or scan of your document
                   </p>
@@ -217,19 +435,40 @@ const App: React.FC = () => {
                   />
 
                   {imagePreview && (
-                    <div className="mt-6">
+                    <div className="mt-4 md:mt-6">
                       <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">Preview</p>
-                      <div className="relative rounded-xl overflow-hidden border border-white/5 aspect-[3/4] bg-white/5">
+                      <div className="relative rounded-xl overflow-hidden glass-card-sm aspect-[3/4]">
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
                       </div>
                     </div>
                   )}
                 </>
+              ) : inputMode === 'batch' ? (
+                <>
+                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">Batch Processing</h2>
+                  <p className="text-xs mb-4 text-earth-muted">
+                    Upload multiple images to extract all at once
+                  </p>
+                  <FileUpload
+                    onFileSelect={handleFileSelect}
+                    onFilesSelect={handleFilesSelect}
+                    selectedFile={null}
+                    selectedFiles={files}
+                    onClear={handleClearFile}
+                    disabled={status === ProcessingStatus.PROCESSING}
+                    batchMode={true}
+                  />
+                  {files.length > 0 && (
+                    <p className="text-xs text-earth-muted mt-3 text-center">
+                      {files.length} image{files.length > 1 ? 's' : ''} selected
+                    </p>
+                  )}
+                </>
               ) : (
                 <>
-                  <h2 className="text-lg font-semibold mb-1 text-earth">Convert PDF to Image</h2>
+                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">PDF to Image</h2>
                   <p className="text-xs mb-4 text-earth-muted">
-                    Upload PDF, select a page, then extract data
+                    Upload PDF, select a page, then extract
                   </p>
                   <PdfUploadView
                     onPageSelect={handlePdfPageSelect}
@@ -238,11 +477,11 @@ const App: React.FC = () => {
                   />
 
                   {imagePreview && pdfPageNumber && (
-                    <div className="mt-6">
+                    <div className="mt-4 md:mt-6">
                       <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">
-                        Selected: Page {pdfPageNumber}
+                        Page {pdfPageNumber}
                       </p>
-                      <div className="relative rounded-xl overflow-hidden border border-white/5 aspect-[3/4] bg-white/5">
+                      <div className="relative rounded-xl overflow-hidden glass-card-sm aspect-[3/4]">
                         <img src={imagePreview} alt={`Page ${pdfPageNumber}`} className="w-full h-full object-contain" />
                       </div>
                     </div>
@@ -250,29 +489,29 @@ const App: React.FC = () => {
                 </>
               )}
 
-              {/* Progress Bar */}
+              {/* Progress */}
               {status === ProcessingStatus.PROCESSING && (
                 <div className="mt-4">
                   <div className="progress-bar-bg h-2">
-                    <div
-                      className="progress-bar-fill"
-                      style={{ width: `${progress}%` }}
-                    />
+                    <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
                   </div>
                   <p className="text-xs mt-2 text-center text-earth-muted">
-                    {progress < 30 ? 'Preparing...' : progress < 90 ? 'AI is analyzing...' : 'Finishing up...'}
+                    {batchProgress
+                      ? `Processing ${batchProgress.current}/${batchProgress.total}...`
+                      : progress < 30 ? 'Preparing...' : progress < 90 ? 'AI is analyzing...' : 'Finishing up...'
+                    }
                   </p>
                 </div>
               )}
 
               {/* Extract Button */}
               <button
-                onClick={processImage}
+                onClick={inputMode === 'batch' ? processBatch : processImage}
                 disabled={!canProcess || status === ProcessingStatus.PROCESSING}
                 className={`
-                  mt-6 w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-full font-semibold transition-all
+                  mt-4 md:mt-6 w-full flex items-center justify-center space-x-2 py-3 md:py-3.5 px-4 rounded-full font-semibold transition-all text-sm md:text-base
                   ${!canProcess || status === ProcessingStatus.PROCESSING
-                    ? 'bg-white/5 text-earth-muted cursor-not-allowed'
+                    ? 'glass-card-sm text-earth-muted cursor-not-allowed'
                     : 'btn-farmer'
                   }
                 `}
@@ -280,18 +519,18 @@ const App: React.FC = () => {
                 {status === ProcessingStatus.PROCESSING ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Analyzing...</span>
+                    <span>{batchProgress ? `${batchProgress.current}/${batchProgress.total}` : 'Analyzing...'}</span>
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    <span>Extract Data</span>
+                    <span>{inputMode === 'batch' ? `Extract ${files.length} Images` : 'Extract Data'}</span>
                   </>
                 )}
               </button>
 
               {errorMsg && (
-                <div className="mt-4 p-3 text-sm rounded-xl flex items-start space-x-2 bg-red-500/10 text-red-400 border border-red-500/20">
+                <div className="mt-4 p-3 text-sm rounded-xl flex items-start space-x-2 bg-red-500/10 text-red-500 border border-red-500/20">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
@@ -300,12 +539,12 @@ const App: React.FC = () => {
 
             {/* Warnings */}
             {result?.warnings && result.warnings.length > 0 && (
-              <div className="glass-card-sm p-4 border-l-4 border-amber-500/50 bg-amber-500/5">
-                <h3 className="text-sm font-semibold mb-2 flex items-center text-amber-400">
+              <div className="glass-card-sm p-4 border-l-4 border-amber-500/50">
+                <h3 className="text-sm font-semibold mb-2 flex items-center text-amber-500">
                   <AlertCircle className="w-4 h-4 mr-2" />
-                  AI Warnings
+                  Notes
                 </h3>
-                <ul className="list-disc list-inside text-xs space-y-1 text-amber-300/80">
+                <ul className="list-disc list-inside text-xs space-y-1 text-earth-muted">
                   {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
                 </ul>
               </div>
@@ -315,41 +554,43 @@ const App: React.FC = () => {
           {/* Right Column: Results */}
           <div className="lg:col-span-8">
             {!result ? (
-              <div className="glass-card h-full min-h-[500px] flex flex-col items-center justify-center p-8">
-                <div className="p-6 rounded-full mb-4 bg-white/5 border border-white/5">
-                  <Layout className="w-12 h-12 text-earth-muted" />
+              <div className="glass-card h-full min-h-[400px] md:min-h-[500px] flex flex-col items-center justify-center p-6 md:p-8">
+                <div className="p-6 glass-card-sm rounded-full mb-4">
+                  <Layout className="w-10 md:w-12 h-10 md:h-12 text-earth-muted" />
                 </div>
-                <h3 className="text-lg font-medium text-earth">No Data Extracted Yet</h3>
-                <p className="text-sm max-w-xs text-center mt-2 text-earth-muted">
-                  {inputMode === 'image'
-                    ? 'Upload a document image and click "Extract Data"'
-                    : 'Upload a PDF, select a page, and click "Extract Data"'
+                <h3 className="text-base md:text-lg font-medium text-earth">No Data Extracted Yet</h3>
+                <p className="text-xs md:text-sm max-w-xs text-center mt-2 text-earth-muted">
+                  {inputMode === 'batch'
+                    ? 'Upload multiple images and click "Extract"'
+                    : inputMode === 'image'
+                      ? 'Upload a document and click "Extract Data"'
+                      : 'Upload a PDF, select a page, and extract'
                   }
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col h-[800px]">
+              <div className="flex flex-col h-[600px] md:h-[800px]">
                 {/* Tabs */}
                 <div className="glass-card-sm flex space-x-1 p-1.5 mb-4 w-fit">
                   <button
                     onClick={() => setActiveTab('table')}
-                    className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === 'table'
-                      ? 'bg-white/10 text-earth'
-                      : 'text-earth-muted hover:text-earth hover:bg-white/5'
+                    className={`flex items-center space-x-2 px-4 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all ${activeTab === 'table'
+                      ? 'glass-card text-earth'
+                      : 'text-earth-muted hover:text-earth'
                       }`}
                   >
                     <Database className="w-4 h-4" />
-                    <span>Data Table ({result.extracted_table.length})</span>
+                    <span>Table ({result.extracted_table.length})</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('text')}
-                    className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === 'text'
-                      ? 'bg-white/10 text-earth'
-                      : 'text-earth-muted hover:text-earth hover:bg-white/5'
+                    className={`flex items-center space-x-2 px-4 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all ${activeTab === 'text'
+                      ? 'glass-card text-earth'
+                      : 'text-earth-muted hover:text-earth'
                       }`}
                   >
                     <Layout className="w-4 h-4" />
-                    <span>Narrative Text</span>
+                    <span>Text</span>
                   </button>
                 </div>
 
@@ -371,8 +612,8 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="mt-4 flex justify-between items-center text-xs text-earth-muted">
-                  <p>Farmer OCR • Data Extraction</p>
-                  <p>Document Type: {result.document_type_guess || 'Unknown'}</p>
+                  <p>Farmer OCR</p>
+                  <p>{result.document_type_guess || 'Unknown'}</p>
                 </div>
               </div>
             )}
@@ -381,9 +622,9 @@ const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 glass-footer py-3 z-40">
+      <footer className="fixed bottom-0 left-0 right-0 glass-footer py-2 md:py-3 z-40">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-xs text-earth-muted">
+          <p className="text-[10px] md:text-xs text-earth-muted">
             © 2024 Farmer OCR • Agricultural Data Collection Tool
           </p>
         </div>
