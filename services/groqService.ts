@@ -33,8 +33,8 @@ export const extractDataFromImage = async (
         throw new Error("Missing Groq API Key. Please set VITE_GROQ_API_KEY.");
     }
 
-    // Llama 4 Scout (Latest Vision Model on Groq)
-    const model = "meta-llama/llama-4-scout-17b-16e-instruct";
+    // Llama 4 Maverick - Better for Hindi OCR (supports Hindi as one of 12 languages)
+    const model = "meta-llama/llama-4-maverick-17b-128e-instruct";
 
     const prompt = `
     ${SYSTEM_PROMPT}
