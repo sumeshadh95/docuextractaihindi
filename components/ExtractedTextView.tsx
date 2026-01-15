@@ -16,25 +16,25 @@ export const ExtractedTextView: React.FC<ExtractedTextViewProps> = ({ text, onTe
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center">
         <div>
-            <h3 className="font-semibold text-slate-800">Extracted Narrative</h3>
-            <p className="text-xs text-slate-500">Headings, paragraphs, instructions</p>
+          <h3 className="font-semibold text-white">Extracted Narrative</h3>
+          <p className="text-xs text-white/60">Headings, paragraphs, instructions</p>
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 hover:text-blue-600 transition-colors"
+          className="btn-glass flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium"
         >
-          {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+          {copied ? <Check className="w-3.5 h-3.5 text-gs-green" /> : <Copy className="w-3.5 h-3.5" />}
           <span>{copied ? 'Copied' : 'Copy Text'}</span>
         </button>
       </div>
-      <div className="flex-1 p-0 relative bg-white">
+      <div className="flex-1 p-2 relative">
         <textarea
           value={text}
           onChange={(e) => onTextChange(e.target.value)}
-          className="w-full h-full min-h-[400px] p-6 resize-none focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500/20 text-slate-800 bg-white leading-relaxed font-mono text-sm placeholder:text-slate-400"
+          className="glass-input w-full h-full min-h-[400px] p-6 resize-none leading-relaxed font-mono text-sm"
           placeholder="No narrative text extracted..."
           spellCheck={false}
         />

@@ -5,17 +5,11 @@ import { ExtractedTableView } from './components/ExtractedTableView';
 import { PdfUploadView } from './components/PdfUploadView';
 import { extractDataFromImage } from './services/geminiService';
 import { ExtractionResult, DynamicRow, ProcessingStatus } from './types';
-import { Sparkles, Layout, Database, AlertCircle, ScanText, Moon, Sun, Image, FileText } from 'lucide-react';
+import { Sparkles, Layout, Database, AlertCircle, Image, FileText, Download } from 'lucide-react';
 
 const App: React.FC = () => {
   // Input mode
   const [inputMode, setInputMode] = useState<'image' | 'pdf'>('image');
-
-  // Dark mode
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved === 'true';
-  });
 
   // Image extraction state
   const [file, setFile] = useState<File | null>(null);
@@ -43,16 +37,6 @@ const App: React.FC = () => {
     "कुल तोड़ाई (Kg)",
     "कुल आमदनी (रु०)"
   ]);
-
-  // Apply dark mode class
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('darkMode', darkMode.toString());
-  }, [darkMode]);
 
   const handleFileSelect = (selectedFile: File) => {
     setFile(selectedFile);
@@ -132,29 +116,25 @@ const App: React.FC = () => {
   const canProcess = imagePreview && import.meta.env.VITE_API_KEY;
 
   return (
-    <div className={`min-h-screen font-sans pb-20 transition-colors duration-300 ${darkMode ? 'dark bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
-      {/* Header */}
-      <header className={`sticky top-0 z-50 border-b transition-colors ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+    <div className="min-h-screen pb-20">
+      {/* Glass Header */}
+      <header className="glass-header sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-600 rounded-lg">
-              <ScanText className="w-5 h-5 text-white" />
+          <div className="flex items-center space-x-4">
+            <img
+              src="/groundswell-logo.png"
+              alt="Groundswell International"
+              className="h-10 object-contain"
+            />
+            <div className="hidden sm:block">
+              <h1 className="text-lg font-semibold text-white">DocuExtract AI</h1>
+              <p className="text-xs text-white/60">Data Extraction Tool</p>
             </div>
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-              DocuExtract AI
-            </h1>
           </div>
           <div className="flex items-center space-x-4">
-            <span className={`text-sm hidden sm:block ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Powered by Groq Llama 4 Scout
+            <span className="text-sm text-white/60 hidden md:block">
+              Powered by Google Gemini
             </span>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className={`p-2 rounded-lg transition-colors ${darkMode ? 'bg-slate-700 hover:bg-slate-600 text-yellow-400' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}
-              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
           </div>
         </div>
       </header>
@@ -162,10 +142,10 @@ const App: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* API Key Warning */}
         {!import.meta.env.VITE_API_KEY && (
-          <div className={`mb-6 rounded-lg p-4 flex items-start space-x-3 ${darkMode ? 'bg-red-900/30 border border-red-800 text-red-300' : 'bg-red-50 border border-red-200 text-red-800'}`}>
-            <AlertCircle className="w-5 h-5 mt-0.5" />
-            <div className="text-sm">
-              <strong>Missing API Key:</strong> Set <code>VITE_API_KEY</code> (Google Gemini) in <code>.env.local</code>.
+          <div className="glass-card-sm mb-6 p-4 flex items-start space-x-3 border-l-4 border-amber-400">
+            <AlertCircle className="w-5 h-5 mt-0.5 text-amber-300" />
+            <div className="text-sm text-white">
+              <strong>Missing API Key:</strong> Set <code className="bg-white/10 px-1.5 py-0.5 rounded">VITE_API_KEY</code> (Google Gemini) in <code className="bg-white/10 px-1.5 py-0.5 rounded">.env.local</code>
             </div>
           </div>
         )}
@@ -174,13 +154,13 @@ const App: React.FC = () => {
           {/* Left Column: Input */}
           <div className="lg:col-span-4 space-y-6">
 
-            {/* Mode Selector */}
-            <div className={`p-1 rounded-lg flex ${darkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
+            {/* Mode Selector - Glass Style */}
+            <div className="glass-card-sm p-1.5 flex">
               <button
                 onClick={() => { setInputMode('image'); handleClearFile(); }}
-                className={`flex-1 flex items-center justify-center space-x-2 py-2.5 rounded-md text-sm font-medium transition-all ${inputMode === 'image'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-800'
+                className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl text-sm font-medium transition-all ${inputMode === 'image'
+                  ? 'btn-groundswell'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
               >
                 <Image className="w-4 h-4" />
@@ -188,9 +168,9 @@ const App: React.FC = () => {
               </button>
               <button
                 onClick={() => { setInputMode('pdf'); handleClearFile(); }}
-                className={`flex-1 flex items-center justify-center space-x-2 py-2.5 rounded-md text-sm font-medium transition-all ${inputMode === 'pdf'
-                  ? 'bg-red-600 text-white shadow-md'
-                  : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-800'
+                className={`flex-1 flex items-center justify-center space-x-2 py-3 rounded-xl text-sm font-medium transition-all ${inputMode === 'pdf'
+                  ? 'btn-groundswell'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
               >
                 <FileText className="w-4 h-4" />
@@ -198,12 +178,12 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            {/* Input Area */}
-            <div className={`rounded-xl shadow-sm border p-6 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+            {/* Input Area - Glass Card */}
+            <div className="glass-card p-6">
               {inputMode === 'image' ? (
                 <>
-                  <h2 className={`text-lg font-semibold mb-1 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>Upload Document Image</h2>
-                  <p className={`text-xs mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <h2 className="text-lg font-semibold mb-1 text-white">Upload Document Image</h2>
+                  <p className="text-xs mb-4 text-white/60">
                     Upload a photo or scan of your document
                   </p>
                   <FileUpload
@@ -215,8 +195,8 @@ const App: React.FC = () => {
 
                   {imagePreview && (
                     <div className="mt-6">
-                      <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Preview</p>
-                      <div className={`relative rounded-lg overflow-hidden border aspect-[3/4] ${darkMode ? 'bg-slate-700 border-slate-600' : 'bg-slate-100 border-slate-200'}`}>
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-white/60">Preview</p>
+                      <div className="relative rounded-xl overflow-hidden border border-white/20 aspect-[3/4] bg-black/20">
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
                       </div>
                     </div>
@@ -224,8 +204,8 @@ const App: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <h2 className={`text-lg font-semibold mb-1 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>Convert PDF to Image</h2>
-                  <p className={`text-xs mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <h2 className="text-lg font-semibold mb-1 text-white">Convert PDF to Image</h2>
+                  <p className="text-xs mb-4 text-white/60">
                     Upload PDF, select a page, then extract data
                   </p>
                   <PdfUploadView
@@ -236,10 +216,10 @@ const App: React.FC = () => {
 
                   {imagePreview && pdfPageNumber && (
                     <div className="mt-6">
-                      <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-white/60">
                         Selected: Page {pdfPageNumber}
                       </p>
-                      <div className={`relative rounded-lg overflow-hidden border aspect-[3/4] ${darkMode ? 'bg-slate-700 border-slate-600' : 'bg-slate-100 border-slate-200'}`}>
+                      <div className="relative rounded-xl overflow-hidden border border-white/20 aspect-[3/4] bg-black/20">
                         <img src={imagePreview} alt={`Page ${pdfPageNumber}`} className="w-full h-full object-contain" />
                       </div>
                     </div>
@@ -250,13 +230,13 @@ const App: React.FC = () => {
               {/* Progress Bar */}
               {status === ProcessingStatus.PROCESSING && (
                 <div className="mt-4">
-                  <div className={`h-2 rounded-full overflow-hidden ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}>
+                  <div className="progress-bar-bg h-2">
                     <div
-                      className="h-full bg-blue-600 transition-all duration-500 ease-out"
+                      className="progress-bar-fill"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <p className={`text-xs mt-1 text-center ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <p className="text-xs mt-2 text-center text-white/60">
                     {progress < 30 ? 'Preparing...' : progress < 90 ? 'AI is analyzing...' : 'Finishing up...'}
                   </p>
                 </div>
@@ -267,16 +247,16 @@ const App: React.FC = () => {
                 onClick={processImage}
                 disabled={!canProcess || status === ProcessingStatus.PROCESSING}
                 className={`
-                  mt-6 w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-all
+                  mt-6 w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-full font-semibold transition-all
                   ${!canProcess || status === ProcessingStatus.PROCESSING
-                    ? darkMode ? 'bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                    ? 'bg-white/10 text-white/40 cursor-not-allowed'
+                    : 'btn-groundswell'
                   }
                 `}
               >
                 {status === ProcessingStatus.PROCESSING ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-slate-400 border-t-blue-400 rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span>Analyzing...</span>
                   </>
                 ) : (
@@ -288,7 +268,7 @@ const App: React.FC = () => {
               </button>
 
               {errorMsg && (
-                <div className={`mt-4 p-3 text-sm rounded-lg flex items-start space-x-2 ${darkMode ? 'bg-red-900/30 text-red-300 border border-red-800' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                <div className="mt-4 p-3 text-sm rounded-xl flex items-start space-x-2 bg-red-500/20 text-red-200 border border-red-500/30">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
@@ -297,12 +277,12 @@ const App: React.FC = () => {
 
             {/* Warnings */}
             {result?.warnings && result.warnings.length > 0 && (
-              <div className={`rounded-xl p-4 ${darkMode ? 'bg-amber-900/30 border border-amber-800' : 'bg-amber-50 border border-amber-200'}`}>
-                <h3 className={`text-sm font-semibold mb-2 flex items-center ${darkMode ? 'text-amber-300' : 'text-amber-800'}`}>
+              <div className="glass-card-sm p-4 border-l-4 border-amber-400">
+                <h3 className="text-sm font-semibold mb-2 flex items-center text-amber-300">
                   <AlertCircle className="w-4 h-4 mr-2" />
                   AI Warnings
                 </h3>
-                <ul className={`list-disc list-inside text-xs space-y-1 ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>
+                <ul className="list-disc list-inside text-xs space-y-1 text-amber-200/80">
                   {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
                 </ul>
               </div>
@@ -312,12 +292,12 @@ const App: React.FC = () => {
           {/* Right Column: Results */}
           <div className="lg:col-span-8">
             {!result ? (
-              <div className={`h-full min-h-[500px] flex flex-col items-center justify-center rounded-xl border border-dashed ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-500' : 'bg-white border-slate-200 text-slate-400'}`}>
-                <div className={`p-6 rounded-full mb-4 ${darkMode ? 'bg-slate-700' : 'bg-slate-50'}`}>
-                  <Layout className={`w-12 h-12 ${darkMode ? 'text-slate-600' : 'text-slate-300'}`} />
+              <div className="glass-card h-full min-h-[500px] flex flex-col items-center justify-center p-8">
+                <div className="p-6 rounded-full mb-4 bg-white/10">
+                  <Layout className="w-12 h-12 text-white/40" />
                 </div>
-                <h3 className={`text-lg font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>No Data Extracted Yet</h3>
-                <p className={`text-sm max-w-xs text-center mt-2 ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>
+                <h3 className="text-lg font-medium text-white">No Data Extracted Yet</h3>
+                <p className="text-sm max-w-xs text-center mt-2 text-white/60">
                   {inputMode === 'image'
                     ? 'Upload a document image and click "Extract Data"'
                     : 'Upload a PDF, select a page, and click "Extract Data"'
@@ -327,12 +307,12 @@ const App: React.FC = () => {
             ) : (
               <div className="flex flex-col h-[800px]">
                 {/* Tabs */}
-                <div className={`flex space-x-1 p-1 rounded-lg mb-4 w-fit ${darkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
+                <div className="glass-card-sm flex space-x-1 p-1.5 mb-4 w-fit">
                   <button
                     onClick={() => setActiveTab('table')}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'table'
-                      ? darkMode ? 'bg-slate-700 text-blue-400 shadow-sm' : 'bg-white text-blue-600 shadow-sm'
-                      : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700'
+                    className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === 'table'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/60 hover:text-white hover:bg-white/10'
                       }`}
                   >
                     <Database className="w-4 h-4" />
@@ -340,9 +320,9 @@ const App: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setActiveTab('text')}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'text'
-                      ? darkMode ? 'bg-slate-700 text-blue-400 shadow-sm' : 'bg-white text-blue-600 shadow-sm'
-                      : darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700'
+                    className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === 'text'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/60 hover:text-white hover:bg-white/10'
                       }`}
                   >
                     <Layout className="w-4 h-4" />
@@ -351,7 +331,7 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-h-0">
+                <div className="glass-card flex-1 min-h-0 overflow-hidden">
                   {activeTab === 'table' ? (
                     <ExtractedTableView
                       rows={result.extracted_table}
@@ -367,8 +347,8 @@ const App: React.FC = () => {
                   )}
                 </div>
 
-                <div className={`mt-4 flex justify-between items-center text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                  <p>AI Model: Groq Llama 4 Scout</p>
+                <div className="mt-4 flex justify-between items-center text-xs text-white/50">
+                  <p>AI Model: Google Gemini 2.0 Flash</p>
                   <p>Document Type: {result.document_type_guess || 'Unknown'}</p>
                 </div>
               </div>
@@ -376,6 +356,15 @@ const App: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 glass-header py-3">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-xs text-white/50">
+            © 2024 Groundswell International • DocuExtract AI - Farmer Data Collection Tool
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

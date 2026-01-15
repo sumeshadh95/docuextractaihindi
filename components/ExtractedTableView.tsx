@@ -119,11 +119,12 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
 
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Header Bar */}
+      <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center">
         <div>
-          <h3 className="font-semibold text-slate-800">Extracted Data</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="font-semibold text-white">Extracted Data</h3>
+          <p className="text-xs text-white/60">
             {isHindiMode ? '🇮🇳 Hindi Mode (Click "English" to revert)' : 'Structured data'}
           </p>
         </div>
@@ -138,36 +139,31 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
 
           <button
             onClick={handleAddRow}
-            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 hover:text-green-600 transition-colors"
+            className="btn-glass flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Row</span>
           </button>
 
-          <div className="h-6 w-px bg-slate-300 mx-1 self-center hidden sm:block"></div>
+          <div className="h-6 w-px bg-white/20 mx-1 self-center hidden sm:block"></div>
 
           {/* Language Toggle Buttons */}
           {isHindiMode && originalRows ? (
-            // Show Revert to English button when in Hindi mode
             <button
               onClick={handleRevertToEnglish}
-              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 border border-blue-200 rounded-md hover:bg-blue-200 hover:text-blue-800 transition-colors"
+              className="btn-glass flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium"
               title="Revert back to English text"
             >
               <Undo2 className="w-3.5 h-3.5" />
               <span>English (Revert)</span>
             </button>
           ) : (
-            // Show Convert to Hindi button when in English mode
             <button
               onClick={handleConvertToHindi}
               disabled={isTransliterating || rows.length === 0}
               className={`
-                flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors
-                ${isTransliterating || rows.length === 0
-                  ? 'text-slate-400 bg-slate-100 border border-slate-200 cursor-not-allowed'
-                  : 'text-orange-700 bg-orange-100 border border-orange-200 hover:bg-orange-200 hover:text-orange-800'
-                }
+                btn-glass flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium
+                ${isTransliterating || rows.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}
               `}
               title="Convert English names to Hindi (Devanagari)"
             >
@@ -187,7 +183,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
 
           <button
             onClick={handleExportXLSX}
-            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-emerald-100 border border-emerald-200 rounded-md hover:bg-emerald-200 hover:text-emerald-800 transition-colors"
+            className="btn-groundswell flex items-center space-x-1.5 px-4 py-1.5 text-xs"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
             <span>Export Excel</span>
@@ -197,41 +193,42 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
 
       {/* Error Message */}
       {transliterationError && (
-        <div className="px-6 py-2 bg-red-50 border-b border-red-100 text-red-600 text-xs">
+        <div className="px-6 py-2 bg-red-500/20 border-b border-red-500/30 text-red-200 text-xs">
           {transliterationError}
         </div>
       )}
 
-      <div className="flex-1 overflow-auto">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-slate-50 sticky top-0 z-10">
+      {/* Table */}
+      <div className="flex-1 overflow-auto p-2">
+        <table className="glass-table">
+          <thead>
             <tr>
               {headers.map((header, i) => (
-                <th key={i} className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200 whitespace-nowrap">
+                <th key={i} className="whitespace-nowrap">
                   {header}
                 </th>
               ))}
-              <th className="px-4 py-3 border-b border-slate-200 w-10"></th>
+              <th className="w-10"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody>
             {rows.map((row, rowIndex) => (
-              <tr key={rowIndex} className="hover:bg-slate-50 group">
+              <tr key={rowIndex} className="group">
                 {headers.map((header, colIndex) => (
-                  <td key={`${rowIndex}-${colIndex}`} className="p-2 border-r border-slate-50 relative min-w-[150px]">
+                  <td key={`${rowIndex}-${colIndex}`} className="min-w-[150px]">
                     <input
                       type="text"
                       value={row[header] || ''}
                       onChange={(e) => handleCellChange(rowIndex, header, e.target.value)}
-                      className="w-full bg-transparent p-1 focus:ring-1 focus:ring-blue-500 rounded text-sm text-slate-700"
+                      className="glass-input w-full text-sm py-1 px-2"
                       placeholder={header}
                     />
                   </td>
                 ))}
-                <td className="p-2 text-center w-10">
+                <td className="text-center w-10">
                   <button
                     onClick={() => handleDeleteRow(rowIndex)}
-                    className="p-1 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                    className="p-1 text-white/30 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -240,7 +237,7 @@ export const ExtractedTableView: React.FC<ExtractedTableViewProps> = ({ rows, he
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={headers.length + 1} className="text-center py-10 text-slate-400 text-sm">
+                <td colSpan={headers.length + 1} className="text-center py-10 text-white/40 text-sm">
                   No data extracted. Add a row or upload an image.
                 </td>
               </tr>

@@ -26,7 +26,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFi
     e.preventDefault();
     setIsDragging(false);
     if (disabled) return;
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith('image/')) {
@@ -49,22 +49,22 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFi
 
   if (selectedFile) {
     return (
-      <div className="relative w-full p-6 border-2 border-blue-200 bg-blue-50 rounded-xl flex items-center justify-between shadow-sm">
+      <div className="relative w-full p-6 border border-white/30 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-between">
         <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white rounded-lg border border-blue-100">
-             <FileImage className="w-8 h-8 text-blue-600" />
-            </div>
-            <div>
-                <p className="text-sm font-medium text-slate-900">{selectedFile.name}</p>
-                <p className="text-xs text-slate-500">{(selectedFile.size / 1024).toFixed(2)} KB</p>
-            </div>
+          <div className="p-3 bg-white/20 rounded-lg border border-white/20">
+            <FileImage className="w-8 h-8 text-gs-green" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-white">{selectedFile.name}</p>
+            <p className="text-xs text-white/60">{(selectedFile.size / 1024).toFixed(2)} KB</p>
+          </div>
         </div>
-        <button 
-            onClick={onClear}
-            disabled={disabled}
-            className="p-2 hover:bg-blue-100 rounded-full transition-colors text-slate-500 hover:text-red-500"
+        <button
+          onClick={onClear}
+          disabled={disabled}
+          className="p-2 hover:bg-white/20 rounded-full transition-colors text-white/60 hover:text-red-400"
         >
-            <X className="w-5 h-5" />
+          <X className="w-5 h-5" />
         </button>
       </div>
     );
@@ -77,12 +77,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFi
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={`
-        w-full p-10 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200
+        upload-dropzone w-full p-10 cursor-pointer transition-all duration-200
         flex flex-col items-center justify-center space-y-4
-        ${isDragging 
-            ? 'border-blue-500 bg-blue-50 scale-[1.01]' 
-            : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50 bg-white'
-        }
+        ${isDragging ? 'active scale-[1.01]' : ''}
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
     >
@@ -94,14 +91,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, selectedFi
         className="hidden"
         disabled={disabled}
       />
-      <div className="p-4 bg-slate-100 rounded-full">
-        <Upload className={`w-8 h-8 ${isDragging ? 'text-blue-600' : 'text-slate-400'}`} />
+      <div className="p-4 bg-white/10 rounded-full">
+        <Upload className={`w-8 h-8 ${isDragging ? 'text-gs-green' : 'text-white/50'}`} />
       </div>
       <div className="text-center">
-        <p className="text-base font-semibold text-slate-700">
+        <p className="text-base font-semibold text-white">
           Click to upload or drag and drop
         </p>
-        <p className="text-sm text-slate-500 mt-1">
+        <p className="text-sm text-white/60 mt-1">
           Supported formats: PNG, JPG, JPEG, WEBP
         </p>
       </div>

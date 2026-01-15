@@ -3,15 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DocuExtract AI</title>
+    <title>DocuExtract AI - Groundswell International</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              primary: '#2563eb',
-              secondary: '#475569',
+              'gs-teal': '#4A7A7B',
+              'gs-teal-dark': '#3D6566',
+              'gs-teal-light': '#5D9A9B',
+              'gs-green': '#78B84A',
+              'gs-green-dark': '#5E9A38',
+              'gs-brown': '#5C4033',
+              'gs-brown-light': '#8B6F47',
+            },
+            fontFamily: {
+              'montserrat': ['Montserrat', 'sans-serif'],
+            },
+            backdropBlur: {
+              'glass': '16px',
             }
           }
         }
@@ -31,7 +45,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-slate-50 text-slate-900 antialiased min-h-screen">
+  <body class="font-montserrat antialiased min-h-screen">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

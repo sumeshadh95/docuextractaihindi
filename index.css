@@ -1,0 +1,264 @@
+/* Groundswell International Theme - Glassmorphic Design */
+
+/* Import font as backup */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+/* Root variables */
+:root {
+  --gs-teal: #4A7A7B;
+  --gs-teal-dark: #3D6566;
+  --gs-teal-light: #5D9A9B;
+  --gs-green: #78B84A;
+  --gs-green-dark: #5E9A38;
+  --gs-brown: #5C4033;
+  --gs-glass-bg: rgba(255, 255, 255, 0.15);
+  --gs-glass-border: rgba(255, 255, 255, 0.3);
+  --gs-glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* Topographic background pattern */
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: var(--gs-teal);
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='2' d='M0 350 Q 250 300 500 350 T 1000 350'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='2' d='M0 400 Q 200 350 400 400 T 800 400 T 1000 400'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='2' d='M0 500 Q 300 450 600 500 T 1000 500'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='2' d='M0 600 Q 250 550 500 600 T 1000 600'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='2' d='M0 700 Q 200 650 400 700 T 800 700 T 1000 700'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='2' d='M0 200 Q 300 150 600 200 T 1000 200'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='2' d='M0 100 Q 250 50 500 100 T 1000 100'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='2' d='M0 800 Q 300 750 600 800 T 1000 800'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='2' d='M0 900 Q 250 850 500 900 T 1000 900'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Glassmorphic card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.glass-card-sm {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.25);
+}
+
+/* Glass header bar */
+.glass-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Groundswell green button */
+.btn-groundswell {
+  background: linear-gradient(135deg, #78B84A 0%, #5E9A38 100%);
+  border-radius: 9999px;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 15px rgba(120, 184, 74, 0.4);
+}
+
+.btn-groundswell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(120, 184, 74, 0.5);
+  background: linear-gradient(135deg, #8DC95B 0%, #6BAB42 100%);
+}
+
+.btn-groundswell:active {
+  transform: translateY(0);
+}
+
+/* Secondary glass button */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Upload drop zone */
+.upload-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.upload-dropzone:hover {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.upload-dropzone.active {
+  border-color: #78B84A;
+  background: rgba(120, 184, 74, 0.1);
+}
+
+/* Table styles */
+.glass-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.glass-table thead th {
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  font-weight: 600;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-table thead th:first-child {
+  border-radius: 12px 0 0 0;
+}
+
+.glass-table thead th:last-child {
+  border-radius: 0 12px 0 0;
+}
+
+.glass-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.glass-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.glass-table tbody td {
+  padding: 0.875rem 1rem;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.glass-table tbody tr:last-child td:first-child {
+  border-radius: 0 0 0 12px;
+}
+
+.glass-table tbody tr:last-child td:last-child {
+  border-radius: 0 0 12px 0;
+}
+
+/* Text colors for glass */
+.text-glass {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.text-glass-muted {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Input styling */
+.glass-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: #78B84A;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(120, 184, 74, 0.2);
+}
+
+.glass-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Tab styling */
+.glass-tab {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 12px 12px 0 0;
+}
+
+.glass-tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.glass-tab.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border-bottom: 2px solid #78B84A;
+}
+
+/* Progress bar */
+.progress-bar-bg {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  background: linear-gradient(90deg, #78B84A 0%, #5E9A38 100%);
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 9999px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animation for loading */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(120, 184, 74, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(120, 184, 74, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
