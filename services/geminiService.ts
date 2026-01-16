@@ -59,14 +59,22 @@ export const extractDataFromImage = async (
             },
           },
           {
-            text: `STRICT OCR TASK: Extract data from this handwritten Hindi document.
+            text: `STRICT OCR TASK: Extract data from this document (handwritten or typed).
 
 CRITICAL RULES:
-1. TRANSCRIBE ONLY what is ACTUALLY WRITTEN - do NOT invent or hallucinate names
-2. Read each cell carefully and transcribe the EXACT Hindi text you see
+1. TRANSCRIBE ONLY what is ACTUALLY WRITTEN - do NOT invent or hallucinate data
+2. Read each cell carefully and transcribe the EXACT text you see
 3. If text is illegible, use empty string "" - do NOT make up data
-4. Column headers must NEVER appear as cell values
-5. "किसान दीदी का नाम" = Female Farmer Name, transcribe actual names
+4. Column headers must NEVER appear as cell values - extract actual row data only
+5. IMPORTANT - PROPER SPACING: Names like "Ramesh Karki" MUST have space between first and last name. Never merge names like "RameshKarki"
+6. For English/Romanized names: Preserve spaces (e.g., "Hari Sharma" not "HariSharma")
+7. For Hindi text: Transcribe exactly as written
+8. For places: Include full address with proper punctuation and spacing
+
+EXAMPLES OF CORRECT EXTRACTION:
+- "Ramesh Karki" ✓ (NOT "RameshKarki" ✗)
+- "Lakeside, Pokhara" ✓ (NOT "LakesidePokhara" ✗)
+- "Hari Sharma" ✓ (NOT "HariSharma" ✗)
 
 Map extracted data to these headers: ${JSON.stringify(headers)}`,
           },
