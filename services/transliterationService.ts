@@ -1,7 +1,8 @@
 import { DynamicRow } from "../types";
+import { GoogleGenAI } from "@google/genai";
 
 /**
- * Transliterates English text to Hindi (Devanagari script) using Groq API.
+ * Transliterates English text to Hindi (Devanagari script) using Gemini API.
  * Uses batch processing to minimize API calls.
  * Returns both the transliterated rows and the original rows for revert functionality.
  */
@@ -9,10 +10,10 @@ export const transliterateToHindi = async (
     rows: DynamicRow[],
     columnsToTransliterate: string[]
 ): Promise<{ transliteratedRows: DynamicRow[], originalRows: DynamicRow[] }> => {
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY || "";
+    const apiKey = import.meta.env.VITE_API_KEY || "";
 
     if (!apiKey) {
-        throw new Error("Missing Groq API Key for transliteration.");
+        throw new Error("Missing API Key for transliteration. Please set VITE_API_KEY.");
     }
 
     // Store original rows for revert
@@ -40,8 +41,8 @@ export const transliterateToHindi = async (
         return { transliteratedRows: rows, originalRows }; // Nothing to transliterate
     }
 
-    // Batch transliterate using Groq
-    const model = "meta-llama/llama-4-scout-17b-16e-instruct";
+    // Initialize Gemini AI
+    const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `
 You are an expert Hindi linguist and transliteration specialist. Your task is to convert English/Romanized Indian names and words into accurate, natural Hindi (Devanagari) script.
@@ -83,45 +84,24 @@ Transliterate each text naturally and accurately.
 `;
 
     try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: {
+                parts: [{ text: prompt }],
             },
-            body: JSON.stringify({
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are a Hindi transliteration expert. You convert Romanized Indian/Nepali names to accurate, natural Devanagari script. Focus on phonetic accuracy - the Hindi text should sound exactly like the English when spoken. Output strict JSON only."
-                    },
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                model: model,
+            config: {
+                systemInstruction: "You are a Hindi transliteration expert. You convert Romanized Indian/Nepali names to accurate, natural Devanagari script. Focus on phonetic accuracy - the Hindi text should sound exactly like the English when spoken. Output strict JSON only.",
+                responseMimeType: "application/json",
                 temperature: 0.2, // Slightly higher for more natural output
-                stream: false,
-                response_format: { type: "json_object" }
-            })
+            },
         });
 
-        if (!response.ok) {
-            const errText = await response.text();
-            let errMsg = response.statusText;
-            try {
-                const errJson = JSON.parse(errText);
-                errMsg = errJson.error?.message || errMsg;
-            } catch (e) { }
-            throw new Error(`Transliteration Error (${response.status}): ${errMsg}`);
+        const text = response.text;
+        if (!text) {
+            throw new Error("No response received from Gemini for transliteration.");
         }
 
-        const data = await response.json();
-        const content = data.choices[0].message.content;
-        const jsonString = content.replace(/```json\n|\n```/g, "").replace(/```/g, "");
-        const result = JSON.parse(jsonString);
-
+        const result = JSON.parse(text);
         const transliterations = result.transliterations || result;
 
         // Update the map with transliterations
