@@ -1,6 +1,76 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { SYSTEM_PROMPT } from "../constants";
-import { ExtractionResult } from "../types";
+import { ExtractionResult, DynamicRow } from "../types";
+
+/**
+ * Fix CamelCase merged names like "RameshKarki" -> "Ramesh Karki"
+ * Also handles other common extraction issues
+ */
+function fixNameSpacing(text: string): string {
+  if (!text || typeof text !== 'string') return text;
+
+  // Skip if already has spaces or is a code/number
+  if (text.includes(' ') || /^[A-Z0-9\-]+$/.test(text) || /^\d/.test(text)) {
+    return text;
+  }
+
+  // Fix CamelCase: insert space between lowercase and uppercase
+  // e.g., "RameshKarki" -> "Ramesh Karki"
+  let fixed = text.replace(/([a-z])([A-Z])/g, '$1 $2');
+
+  // Fix patterns like "Hetauda-5Makwanpur" -> "Hetauda-5 Makwanpur"
+  fixed = fixed.replace(/(\d)([A-Z])/g, '$1 $2');
+
+  // Clean up multiple spaces
+  fixed = fixed.replace(/\s+/g, ' ').trim();
+
+  return fixed;
+}
+
+/**
+ * Post-process extracted table to fix common issues
+ */
+function postProcessExtractedData(result: ExtractionResult, headers: string[]): ExtractionResult {
+  // Columns that typically contain names and need spacing fixes
+  const nameColumns = [
+    'भी.आर.पी नाम', 'BRP Name', 'BRP नाम',
+    'किसान नाम', 'Farmer Name', 'किसान दीदी का नाम',
+    'पति/पिता का नाम', 'Father/Husband Name',
+    'गाँव', 'Village', 'Address'
+  ];
+
+  if (!result.extracted_table || !Array.isArray(result.extracted_table)) {
+    return result;
+  }
+
+  const processedTable: DynamicRow[] = result.extracted_table.map(row => {
+    const processedRow: DynamicRow = { ...row };
+
+    // Apply name spacing fix to relevant columns
+    Object.keys(row).forEach(key => {
+      const value = row[key];
+      if (typeof value === 'string') {
+        // Check if this is a name-like column
+        const isNameColumn = nameColumns.some(col =>
+          key.toLowerCase().includes(col.toLowerCase()) ||
+          col.toLowerCase().includes(key.toLowerCase()) ||
+          key.includes('नाम') || key.includes('Name') || key.includes('Village') || key.includes('गाँव')
+        );
+
+        if (isNameColumn) {
+          processedRow[key] = fixNameSpacing(value);
+        }
+      }
+    });
+
+    return processedRow;
+  });
+
+  return {
+    ...result,
+    extracted_table: processedTable
+  };
+}
 
 export const extractDataFromImage = async (
   base64Image: string,
@@ -94,7 +164,11 @@ Map extracted data to these headers: ${JSON.stringify(headers)}`,
     }
 
     const result = JSON.parse(text) as ExtractionResult;
-    return result;
+
+    // Post-process to fix any remaining name spacing issues
+    const processedResult = postProcessExtractedData(result, headers);
+
+    return processedResult;
 
   } catch (error) {
     console.error("Gemini Extraction Error:", error);

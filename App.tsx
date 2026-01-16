@@ -8,7 +8,8 @@ import { RateLimitIndicator, getUsageToday, incrementUsage, DAILY_LIMIT } from '
 import { InstallPrompt } from './components/InstallPrompt';
 import { extractDataFromImage } from './services/geminiService';
 import { ExtractionResult, DynamicRow, ProcessingStatus } from './types';
-import { Sparkles, Layout, Database, AlertCircle, Image, FileText, Sun, Moon, Wheat, History, Layers } from 'lucide-react';
+import { Language, useTranslation } from './translations';
+import { Sparkles, Layout, Database, AlertCircle, Image, FileText, Sun, Moon, Wheat, History, Layers, Globe } from 'lucide-react';
 
 // Simple hash for caching
 const hashString = async (str: string): Promise<string> => {
@@ -22,6 +23,13 @@ const hashString = async (str: string): Promise<string> => {
 const App: React.FC = () => {
   // Input mode
   const [inputMode, setInputMode] = useState<'image' | 'pdf' | 'batch'>('image');
+
+  // Language
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem('appLanguage');
+    return (saved === 'hi' || saved === 'en') ? saved : 'en';
+  });
+  const { t } = useTranslation(language);
 
   // Dark mode
   const [darkMode, setDarkMode] = useState(() => {
@@ -83,6 +91,11 @@ const App: React.FC = () => {
     }
     localStorage.setItem('darkMode', darkMode.toString());
   }, [darkMode]);
+
+  // Save language preference
+  useEffect(() => {
+    localStorage.setItem('appLanguage', language);
+  }, [language]);
 
   // Save history to localStorage
   useEffect(() => {
@@ -315,8 +328,8 @@ const App: React.FC = () => {
               <Wheat className="w-6 h-6 sm:w-7 sm:h-7 farmer-icon" />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg font-bold text-earth">Farmer OCR</h1>
-              <p className="text-xs text-earth-muted">Data Extraction Tool</p>
+              <h1 className="text-lg font-bold text-earth">{t('appName')}</h1>
+              <p className="text-xs text-earth-muted">{t('appSubtitle')}</p>
             </div>
           </div>
 
@@ -330,7 +343,7 @@ const App: React.FC = () => {
             <button
               onClick={() => setHistorySidebarOpen(true)}
               className="dark-mode-toggle relative"
-              title="View History"
+              title={t('viewHistory')}
             >
               <History className="w-5 h-5 text-earth-muted" />
               {history.length > 0 && (
@@ -338,6 +351,18 @@ const App: React.FC = () => {
                   {history.length}
                 </span>
               )}
+            </button>
+
+            {/* Language Toggle */}
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+              className="dark-mode-toggle flex items-center space-x-1"
+              title={language === 'en' ? t('switchToHindi') : t('switchToEnglish')}
+            >
+              <Globe className="w-5 h-5 text-earth-muted" />
+              <span className="text-xs font-medium text-earth-muted hidden sm:inline">
+                {language === 'en' ? 'हिं' : 'EN'}
+              </span>
             </button>
 
             {/* Dark Mode Toggle */}
@@ -396,7 +421,7 @@ const App: React.FC = () => {
                   }`}
               >
                 <Image className="w-4 h-4" />
-                <span>Image</span>
+                <span>{t('image')}</span>
               </button>
               <button
                 onClick={() => { setInputMode('batch'); handleClearFile(); }}
@@ -406,7 +431,7 @@ const App: React.FC = () => {
                   }`}
               >
                 <Layers className="w-4 h-4" />
-                <span>Batch</span>
+                <span>{t('batch')}</span>
               </button>
               <button
                 onClick={() => { setInputMode('pdf'); handleClearFile(); }}
@@ -416,7 +441,7 @@ const App: React.FC = () => {
                   }`}
               >
                 <FileText className="w-4 h-4" />
-                <span>PDF</span>
+                <span>{t('pdf')}</span>
               </button>
             </div>
 
@@ -424,9 +449,9 @@ const App: React.FC = () => {
             <div className="glass-card p-4 md:p-6">
               {inputMode === 'image' ? (
                 <>
-                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">Upload Image</h2>
+                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">{t('uploadImage')}</h2>
                   <p className="text-xs mb-4 text-earth-muted">
-                    Upload a photo or scan of your document
+                    {t('uploadImageDesc')}
                   </p>
                   <FileUpload
                     onFileSelect={handleFileSelect}
@@ -437,7 +462,7 @@ const App: React.FC = () => {
 
                   {imagePreview && (
                     <div className="mt-4 md:mt-6">
-                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">Preview</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">{t('preview')}</p>
                       <div className="relative rounded-xl overflow-hidden glass-card-sm aspect-[3/4]">
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
                       </div>
@@ -446,9 +471,9 @@ const App: React.FC = () => {
                 </>
               ) : inputMode === 'batch' ? (
                 <>
-                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">Batch Processing</h2>
+                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">{t('batchProcessing')}</h2>
                   <p className="text-xs mb-4 text-earth-muted">
-                    Upload multiple images to extract all at once
+                    {t('batchProcessingDesc')}
                   </p>
                   <FileUpload
                     onFileSelect={handleFileSelect}
@@ -461,15 +486,15 @@ const App: React.FC = () => {
                   />
                   {files.length > 0 && (
                     <p className="text-xs text-earth-muted mt-3 text-center">
-                      {files.length} image{files.length > 1 ? 's' : ''} selected
+                      {files.length} {t('imagesSelected')}
                     </p>
                   )}
                 </>
               ) : (
                 <>
-                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">PDF to Image</h2>
+                  <h2 className="text-base md:text-lg font-semibold mb-1 text-earth">{t('pdfToImage')}</h2>
                   <p className="text-xs mb-4 text-earth-muted">
-                    Upload PDF, select a page, then extract
+                    {t('pdfToImageDesc')}
                   </p>
                   <PdfUploadView
                     onPageSelect={handlePdfPageSelect}
@@ -480,7 +505,7 @@ const App: React.FC = () => {
                   {imagePreview && pdfPageNumber && (
                     <div className="mt-4 md:mt-6">
                       <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-earth-muted">
-                        Page {pdfPageNumber}
+                        {t('page')} {pdfPageNumber}
                       </p>
                       <div className="relative rounded-xl overflow-hidden glass-card-sm aspect-[3/4]">
                         <img src={imagePreview} alt={`Page ${pdfPageNumber}`} className="w-full h-full object-contain" />
@@ -498,8 +523,8 @@ const App: React.FC = () => {
                   </div>
                   <p className="text-xs mt-2 text-center text-earth-muted">
                     {batchProgress
-                      ? `Processing ${batchProgress.current}/${batchProgress.total}...`
-                      : progress < 30 ? 'Preparing...' : progress < 90 ? 'AI is analyzing...' : 'Finishing up...'
+                      ? `${t('processing')} ${batchProgress.current}/${batchProgress.total}...`
+                      : progress < 30 ? t('preparing') : progress < 90 ? t('aiAnalyzing') : t('finishingUp')
                     }
                   </p>
                 </div>
@@ -520,12 +545,12 @@ const App: React.FC = () => {
                 {status === ProcessingStatus.PROCESSING ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>{batchProgress ? `${batchProgress.current}/${batchProgress.total}` : 'Analyzing...'}</span>
+                    <span>{batchProgress ? `${batchProgress.current}/${batchProgress.total}` : t('analyzing')}</span>
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    <span>{inputMode === 'batch' ? `Extract ${files.length} Images` : 'Extract Data'}</span>
+                    <span>{inputMode === 'batch' ? t('extractImages', { count: files.length }) : t('extractData')}</span>
                   </>
                 )}
               </button>
@@ -543,7 +568,7 @@ const App: React.FC = () => {
               <div className="glass-card-sm p-4 border-l-4 border-amber-500/50">
                 <h3 className="text-sm font-semibold mb-2 flex items-center text-amber-500">
                   <AlertCircle className="w-4 h-4 mr-2" />
-                  Notes
+                  {t('notes')}
                 </h3>
                 <ul className="list-disc list-inside text-xs space-y-1 text-earth-muted">
                   {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
@@ -559,13 +584,13 @@ const App: React.FC = () => {
                 <div className="p-6 glass-card-sm rounded-full mb-4">
                   <Layout className="w-10 md:w-12 h-10 md:h-12 text-earth-muted" />
                 </div>
-                <h3 className="text-base md:text-lg font-medium text-earth">No Data Extracted Yet</h3>
+                <h3 className="text-base md:text-lg font-medium text-earth">{t('noDataYet')}</h3>
                 <p className="text-xs md:text-sm max-w-xs text-center mt-2 text-earth-muted">
                   {inputMode === 'batch'
-                    ? 'Upload multiple images and click "Extract"'
+                    ? t('noDataBatchDesc')
                     : inputMode === 'image'
-                      ? 'Upload a document and click "Extract Data"'
-                      : 'Upload a PDF, select a page, and extract'
+                      ? t('noDataYetDesc')
+                      : t('noDataPdfDesc')
                   }
                 </p>
               </div>
@@ -581,7 +606,7 @@ const App: React.FC = () => {
                       }`}
                   >
                     <Database className="w-4 h-4" />
-                    <span>Table ({result.extracted_table.length})</span>
+                    <span>{t('table')} ({result.extracted_table.length})</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('text')}
@@ -591,7 +616,7 @@ const App: React.FC = () => {
                       }`}
                   >
                     <Layout className="w-4 h-4" />
-                    <span>Text</span>
+                    <span>{t('text')}</span>
                   </button>
                 </div>
 
@@ -629,7 +654,7 @@ const App: React.FC = () => {
       <footer className="fixed bottom-0 left-0 right-0 glass-footer py-2 md:py-3 z-40">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-[10px] md:text-xs text-earth-muted">
-            © 2024 Farmer OCR • Agricultural Data Collection Tool
+            {t('copyright', { year: new Date().getFullYear() })}
           </p>
         </div>
       </footer>
